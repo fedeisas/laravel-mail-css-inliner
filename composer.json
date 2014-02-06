@@ -1,0 +1,33 @@
+{
+    "name": "fedeisas/laravel-mail-css-inliner",
+    "description": "Inline the css of your html emails",
+    "license": "MIT",
+    "version": "0.1.0",
+    "keywords": ["laravel", "mailer", "css"],
+    "authors": [
+        {
+            "name": "Fede Isas",
+            "email": "fedeisas@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "illuminate/support": "4.1.*",
+        "tijsverkoyen/css-to-inline-styles": "1.2.*"
+    },
+    "require-dev" : {
+        "swiftmailer/swiftmailer": "5.0.*",
+        "phpunit/phpunit": "3.7.27",
+        "mockery/mockery": "0.8.0",
+        "squizlabs/php_codesniffer": "1.*",
+        "jakub-onderka/php-parallel-lint": "*",
+        "jakub-onderka/php-console-highlighter": "dev-master",
+        "phpmd/phpmd": "1.5.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Fedeisas\\LaravelMailCssInliner": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

@@ -1,0 +1,23 @@
+language: php
+
+php:
+  - 5.4
+  - 5.5
+
+before_script:
+  - mkdir -p build/logs
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar require --dev satooshi/php-coveralls:dev-master
+  - php composer.phar install --dev
+
+script:
+  - ./vendor/bin/phpcs --standard=phpcs.xml ./src/
+  - ./vendor/bin/phpcs --standard=phpcs.xml ./tests/
+  - ./vendor/bin/phpmd ./src/ text phpmd.xml
+  - ./vendor/bin/phpmd ./tests/ text phpmd.xml
+  - ./vendor/bin/parallel-lint ./src/
+  - ./vendor/bin/parallel-lint ./tests/
+  - ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+after_script:
+  - php vendor/bin/coveralls -v
