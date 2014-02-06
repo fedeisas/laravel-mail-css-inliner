@@ -1,5 +1,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
-<html><head></head><body>
+<html><head><style>
+            .block {
+                width: 100px;
+                height: 20px;
+            }
+            div.block ul li.small {
+                margin: 10px;
+            }
+        </style></head><body>
         <div style="height: 20px; width: 100px;">
             text
 
