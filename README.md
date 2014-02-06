@@ -82,7 +82,3 @@ This package is greatly inspired, and mostly copied, from [SwiftMailer CSS Inlin
 
 ## License
 This package is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/fedeisas/laravel-mail-css-inliner/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
