@@ -1,6 +1,6 @@
 {
     "name": "fedeisas/laravel-mail-css-inliner",
-    "description": "Inline the css of your html emails",
+    "description": "Inline the CSS of your HTML emails using Laravel",
     "license": "MIT",
     "version": "0.1.0",
     "keywords": ["laravel", "mailer", "css"],

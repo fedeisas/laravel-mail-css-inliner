@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <style>
+            .block {
+                width: 100px;
+                height: 20px;
+            }
+            div.block ul li.small {
+                margin: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="block">
+            text
+
+            <ul>
+                <li>
+                    Big list
+                </li>
+                <li class="small">
+                    Small list
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>
