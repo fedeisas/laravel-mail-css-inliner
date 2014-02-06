@@ -10,7 +10,7 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      *
      * @var bool
      */
-    protected $defer = true;
+    protected $defer = false;
 
     /**
      * Bootstrap the application events.
@@ -19,7 +19,7 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->package('fedeisas/laravel-mail-css-inliner');
+        $this->app['mailer']->getSwiftMailer()->registerPlugin(new CssInlinerPlugin());
     }
 
     /**
@@ -29,7 +29,7 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app['mailer']->getSwiftMailer()->registerPlugin(new CssInlinerPlugin());
+        // Do nothing
     }
 
     /**

@@ -15,19 +15,18 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test **/
-    public function it_should_convert_html_body()
+    public function itShouldConvertHtmlBody()
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPLugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin());
 
         $message = Swift_Message::newInstance();
 
         $message->setFrom('test@example.com');
         $message->setTo('test2@example.com');
         $message->setSubject('Test');
-        $message->setContentType('text/html');
-        $message->setBody($this->stubs['original-html']);
+        $message->setBody($this->stubs['original-html'], 'text/html');
 
         $mailer->send($message);
 
@@ -35,33 +34,34 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test **/
-    public function it_should_convert_html_parts()
+    public function itShouldConvertHtmlBodyAndTextParts()
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPLugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin());
 
         $message = Swift_Message::newInstance();
 
         $message->setFrom('test@example.com');
         $message->setTo('test2@example.com');
         $message->setSubject('Test');
-        $message->addPart($this->stubs['original-html'], 'text/html');
-        $message->addPart('plain part', 'text/plain');
+        $message->setBody($this->stubs['original-html'], 'text/html');
+        $message->addPart($this->stubs['plain-text'], 'text/plain');
 
         $mailer->send($message);
 
         $children = $message->getChildren();
 
-        $this->assertEquals($this->stubs['converted-html'], $children[0]->getBody());
+        $this->assertEquals($this->stubs['converted-html'], $message->getBody());
+        $this->assertEquals($this->stubs['plain-text'], $children[0]->getBody());
     }
 
     /** @test **/
-    public function it_should_leave_plain_text_unmodified()
+    public function itShouldLeavePlainTextUnmodified()
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPLugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin());
 
         $message = Swift_Message::newInstance();
 
@@ -75,5 +75,26 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
         $children = $message->getChildren();
 
         $this->assertEquals($this->stubs['plain-text'], $children[0]->getBody());
+    }
+
+    /** @test **/
+    public function itShouldConvertHtmlBodyAsAPart()
+    {
+        $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
+
+        $mailer->registerPlugin(new CssInlinerPlugin());
+
+        $message = Swift_Message::newInstance();
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+        $message->setSubject('Test');
+        $message->addPart($this->stubs['original-html'], 'text/html');
+
+        $mailer->send($message);
+
+        $children = $message->getChildren();
+
+        $this->assertEquals($this->stubs['converted-html'], $children[0]->getBody());
     }
 }

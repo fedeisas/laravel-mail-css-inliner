@@ -18,9 +18,10 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $converter->setUseInlineStylesBlock();
         $converter->setStripOriginalStyleTags();
         $converter->setCleanup();
-        $converter->setCSS('');
 
-        if ($message->getContentType() === 'text/html') {
+        if ($message->getContentType() === 'text/html' ||
+            ($message->getContentType() === 'multipart/alternative' && $message->getBody())
+        ) {
             $converter->setHTML($message->getBody());
             $message->setBody($converter->convert());
         }

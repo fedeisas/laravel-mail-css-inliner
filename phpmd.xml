@@ -24,6 +24,4 @@
         </properties>
     </rule>
 
-    <rule ref="rulesets/unusedcode.xml" />
-
 </ruleset>
