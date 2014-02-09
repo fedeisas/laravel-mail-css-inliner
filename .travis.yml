@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.3
   - 5.4
   - 5.5
 
@@ -9,7 +8,7 @@ before_script:
   - mkdir -p build/logs
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar require --dev satooshi/php-coveralls:dev-master
-  - php composer.phar install --dev
+  - php composer.phar install --dev --no-interaction
 
 script:
   - ./vendor/bin/phpcs --standard=phpcs.xml ./src/
