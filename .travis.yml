@@ -3,6 +3,7 @@ language: php
 php:
   - 5.4
   - 5.5
+  - hhvm
 
 before_script:
   - mkdir -p build/logs
@@ -21,3 +22,8 @@ script:
 
 after_script:
   - php vendor/bin/coveralls -v
+
+matrix:
+  allow_failures:
+    - php: hhvm
+  fast_finish: true
