@@ -78,7 +78,7 @@ In addition to a full test suite, there is Travis integration.
 Please, let me know! Send a pull request or a patch. Questions? Ask! I will respond to all filed issues.
 
 ## Inspiration
-This package is greatly inspired, and mostly copied, from [SwiftMailer CSS Inliner](https://github.com/https://github.com/OpenBuildings/swiftmailer-css-inliner). I just made an easy drop-in solution for Laravel.
+This package is greatly inspired, and mostly copied, from [SwiftMailer CSS Inliner](https://github.com/OpenBuildings/swiftmailer-css-inliner). I just made an easy drop-in solution for Laravel.
 
 ## License
 This package is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
