@@ -3,7 +3,6 @@ Laravel Mail CSS Inliner
 
 [![Travis Badge](https://secure.travis-ci.org/fedeisas/laravel-mail-css-inliner.png)](http://travis-ci.org/fedeisas/laravel-mail-css-inliner)
 [![Coverage Status](https://coveralls.io/repos/fedeisas/laravel-mail-css-inliner/badge.png)](https://coveralls.io/r/fedeisas/laravel-mail-css-inliner)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/fedeisas/laravel-mail-css-inliner/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 [![Latest Stable Version](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/v/stable.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
 [![Latest Unstable Version](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/v/unstable.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
 [![Total Downloads](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/downloads.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
