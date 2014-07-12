@@ -12,17 +12,17 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "illuminate/support": "~4.1",
-        "tijsverkoyen/css-to-inline-styles": "1.2.*"
+        "illuminate/support": "4.1.*",
+        "tijsverkoyen/css-to-inline-styles": "~1.2"
     },
     "require-dev" : {
-        "swiftmailer/swiftmailer": "5.0.*",
-        "phpunit/phpunit": "3.7.*",
-        "mockery/mockery": "0.9.*",
-        "squizlabs/php_codesniffer": "1.*",
+        "swiftmailer/swiftmailer": "~5.0",
+        "phpunit/phpunit": "~4.0",
+        "mockery/mockery": "~0.8",
+        "squizlabs/php_codesniffer": "~1.5",
         "jakub-onderka/php-parallel-lint": "dev-master",
         "jakub-onderka/php-console-highlighter": "dev-master",
-        "phpmd/phpmd": "1.5.*"
+        "phpmd/phpmd": "~1.5"
     },
     "autoload": {
         "psr-4": {
