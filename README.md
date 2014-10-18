@@ -49,10 +49,9 @@ Begin by installing this package through Composer. Edit your project's `composer
 ```json
 {
   "require": {
-        "laravel/framework": ">= 4.1.*",
-        "fedeisas/laravel-mail-css-inliner": "1.*"
-    },
-    "minimum-stability" : "dev"
+        "laravel/framework": "4.1.*",
+        "fedeisas/laravel-mail-css-inliner": "~1.3"
+    }
 }
 ```
 
@@ -68,7 +67,7 @@ Once this operation completes, the final step is to add the service provider. Op
 
 ## Contributing
 ```bash
-$ composer install --dev
+$ composer install
 $ ./vendor/bin/phpunit
 ```
 In addition to a full test suite, there is Travis integration.
