@@ -8,13 +8,13 @@
                 margin: 10px;
             }
         </style></head><body>
-        <div style="height: 20px; width: 100px;">
+        <div  style="height: 20px; width: 100px;">
             text
 
             <ul><li>
                     Big list
                 </li>
-                <li style="margin: 10px;">
+                <li  style="margin: 10px;">
                     Small list
                 </li>
             </ul></div>
