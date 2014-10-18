@@ -49,7 +49,7 @@ Begin by installing this package through Composer. Edit your project's `composer
 ```json
 {
   "require": {
-        "laravel/framework": "4.0.*",
+        "laravel/framework": ">= 4.1.*",
         "fedeisas/laravel-mail-css-inliner": "1.*"
     },
     "minimum-stability" : "dev"
