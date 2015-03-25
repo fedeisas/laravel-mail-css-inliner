@@ -6,7 +6,6 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class CssInlinerPlugin implements \Swift_Events_SendListener
 {
-
     /**
      * @param Swift_Events_SendEvent $evt
      */
@@ -25,8 +24,6 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             $message->setBody($this->includeExternalStylesheets($message->getBody()),'text/html');
             $converter->setHTML($message->getBody());
             $message->setBody($converter->convert());
-            
-        
         }
 
         foreach ($message->getChildren() as $part) {
