@@ -21,7 +21,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         if ($message->getContentType() === 'text/html' ||
             ($message->getContentType() === 'multipart/alternative' && $message->getBody())
         ) {
-            $message->setBody($this->includeExternalStylesheets($message->getBody()),'text/html');
+            $message->setBody($this->includeExternalStylesheets($message->getBody()), 'text/html');
             $converter->setHTML($message->getBody());
             $message->setBody($converter->convert());
         }
@@ -34,7 +34,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         }
     }
 
-    public function includeExternalStylesheets($message)
+    private function includeExternalStylesheets($message)
     {
         preg_match_all('/<link[^>]+>/mi', $message, $matches);
         $linkElements = $matches[0];
