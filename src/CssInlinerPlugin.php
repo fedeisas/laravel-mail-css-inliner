@@ -14,6 +14,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $message = $evt->getMessage();
 
         $converter = new CssToInlineStyles();
+        $external = new ExternalCssPlugin();
         $converter->setEncoding($message->getCharset());
         $converter->setUseInlineStylesBlock();
         $converter->setCleanup();
@@ -21,6 +22,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         if ($message->getContentType() === 'text/html' ||
             ($message->getContentType() === 'multipart/alternative' && $message->getBody())
         ) {
+            $message->setBody($external->includeExternalStylesheets($message->getBody()), 'text/html');
             $converter->setHTML($message->getBody());
             $message->setBody($converter->convert());
         }
@@ -32,6 +34,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             }
         }
     }
+
 
     /**
      * Do nothing
