@@ -12,7 +12,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
     {
         $message = $evt->getMessage();
-        
+
         $converter = new CssToInlineStyles();
         $external = new ExternalCssPlugin();
         $converter->setEncoding($message->getCharset());

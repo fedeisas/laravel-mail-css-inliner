@@ -2,13 +2,14 @@
 
 namespace Fedeisas\LaravelMailCssInliner;
 
-class ExternalCssPlugin {
+class ExternalCssPlugin
+{
 
     /**
      * @param $message
      * @return string
      */
-	public function includeExternalStylesheets($message)
+    public function includeExternalStylesheets($message)
     {
         preg_match_all('/<link[^>]+>/mi', $message, $matches);
         $linkElements = $matches[0];
@@ -27,16 +28,17 @@ class ExternalCssPlugin {
      * @param $linkElement
      * @return string
      */
-    private function getCssContent($linkElement)
+
+    public function getCssContent($linkElement)
     {
         // load data from html element
         preg_match_all("/href=['\"]([^'\"]+)['\"]/", $linkElement, $matches);
         $absUrl = $matches[1][0];
-        
+
         $cssContent = @file_get_contents($absUrl);
 
         if (!$cssContent) {
-            trigger_error('Error loading stylesheet from ' . $absUrl.'--'.getcwd(), E_USER_NOTICE);
+            trigger_error('Error loading stylesheet from ' . $absUrl . '--' . getcwd(), E_USER_NOTICE);
         }
 
         return $cssContent;
