@@ -19,7 +19,11 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app['mailer']->getSwiftMailer()->registerPlugin(new CssInlinerPlugin());
+        $this->app['mailer']->getSwiftMailer()->registerPlugin(new CssInlinerPlugin($this->app['config']));
+
+        $this->publishes([
+            __DIR__.'/config/laravel-mail-css-inliner.php' => config_path('laravel-mail-css-inliner.php'),
+        ]);
     }
 
     /**
@@ -29,7 +33,9 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Do nothing
+        $this->mergeConfigFrom(
+            __DIR__.'/config/laravel-mail-css-inliner.php', 'laravel-mail-css-inliner'
+        );
     }
 
     /**
