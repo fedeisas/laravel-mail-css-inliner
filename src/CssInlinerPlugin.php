@@ -19,7 +19,8 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $converter->setCleanup();
 
         if ($message->getContentType() === 'text/html' ||
-            ($message->getContentType() === 'multipart/alternative' && $message->getBody())
+            ($message->getContentType() === 'multipart/alternative' && $message->getBody()) ||
+            ($message->getContentType() === 'multipart/mixed' && $message->getBody())
         ) {
             $converter->setHTML($message->getBody());
             $message->setBody($converter->convert());
