@@ -46,11 +46,11 @@ Into this:
 ## Installation
 Begin by installing this package through Composer. Edit your project's `composer.json` file to require `fedeisas/laravel-mail-css-inliner`.
 
+This package needs Laravel 4.x or Laravel 5.x
 ```json
 {
   "require": {
-        "laravel/framework": "4.1.*",
-        "fedeisas/laravel-mail-css-inliner": "~1.3"
+        "fedeisas/laravel-mail-css-inliner": "~1.4"
     }
 }
 ```
