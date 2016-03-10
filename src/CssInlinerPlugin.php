@@ -23,13 +23,15 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             ($message->getContentType() === 'multipart/alternative' && $message->getBody()) ||
             ($message->getContentType() === 'multipart/mixed' && $message->getBody())
         ) {
-            $converter->setHTML($message->getBody());
+            $html = '<?xml encoding="UTF-8">' . $message->getBody();
+            $converter->setHTML($html);
             $message->setBody($converter->convert());
         }
 
         foreach ($message->getChildren() as $part) {
             if (strpos($part->getContentType(), 'text/html') === 0) {
-                $converter->setHTML($part->getBody());
+                $html = '<?xml encoding="UTF-8">' . $part->getBody();
+                $converter->setHTML($html);
                 $part->setBody($converter->convert());
             }
         }
