@@ -8,13 +8,16 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
 
     protected $options;
 
+    protected static $stubDefinitions = array(
+        'plain-text', 'original-html', 'converted-html', 'converted-html-with-classes',
+        'converted-html-with-styles'
+    );
+
     public function setUp()
     {
-        $this->stubs['plain-text'] = file_get_contents(__DIR__.'/stubs/plain-text.stub');
-        $this->stubs['original-html'] = file_get_contents(__DIR__.'/stubs/original-html.stub');
-        $this->stubs['converted-html'] = file_get_contents(__DIR__.'/stubs/converted-html.stub');
-        $this->stubs['converted-html-with-classes'] = file_get_contents(__DIR__.'/stubs/converted-html-with-classes.stub');
-        $this->stubs['converted-html-with-styles'] = file_get_contents(__DIR__.'/stubs/converted-html-with-styles.stub');
+        foreach (self::$stubDefinitions as $stub) {
+            $this->stubs[$stub] = file_get_contents(__DIR__.'/stubs/'.$stub.'.stub');
+        }
 
         $this->options = require(__DIR__.'/../config/css-inliner.php');
     }
@@ -144,5 +147,4 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($this->stubs['converted-html'], $children[0]->getBody());
     }
-
 }
