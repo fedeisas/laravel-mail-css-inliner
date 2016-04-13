@@ -32,16 +32,14 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/css-inliner.php', 'css-inliner'
-        );
+        $this->mergeConfigFrom(__DIR__.'/../config/css-inliner.php', 'css-inliner');
 
-        $this->app->singleton('Fedeisas\LaravelMailCssInliner\CssInlinerPlugin', function($app) {
+        $this->app->singleton('Fedeisas\LaravelMailCssInliner\CssInlinerPlugin', function ($app) {
             $options = $app['config']->get('css-inliner');
             return new CssInlinerPlugin($options);
         });
 
-        $this->app->extend('swift.mailer', function(Swift_Mailer $swiftMailer, $app) {
+        $this->app->extend('swift.mailer', function (Swift_Mailer $swiftMailer, $app) {
             $inlinerPlugin = $app->make('Fedeisas\LaravelMailCssInliner\CssInlinerPlugin');
             $swiftMailer->registerPlugin($inlinerPlugin);
             return $swiftMailer;
