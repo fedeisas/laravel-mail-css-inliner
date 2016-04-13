@@ -27,18 +27,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $message = $evt->getMessage();
 
         $converter = new CssToInlineStyles();
-
-        // Always enabled because there is no way to specify an external style sheet
-        // when using this plugin
-        $converter->setUseInlineStylesBlock();
-
-        if ($this->options['strip-styles']) {
-            $converter->setStripOriginalStyleTags();
-        }
-
-        if ($this->options['strip-classes']) {
-            $converter->setCleanup();
-        }
+        $this->applySettings($converter);
 
         if ($message->getContentType() === 'text/html' ||
             ($message->getContentType() === 'multipart/alternative' && $message->getBody()) ||
@@ -53,6 +42,26 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
                 $converter->setHTML($part->getBody());
                 $part->setBody($converter->convert());
             }
+        }
+    }
+
+    /**
+     * Applies the configuration settings.
+     *
+     * @param CssToInlineStyles $converter
+     */
+    private function applySettings(CssToInlineStyles $converter)
+    {
+        // Always enabled because there is no way to specify an external style sheet
+        // when using this plugin
+        $converter->setUseInlineStylesBlock();
+
+        if ($this->options['strip-styles']) {
+            $converter->setStripOriginalStyleTags();
+        }
+
+        if ($this->options['strip-classes']) {
+            $converter->setCleanup();
         }
     }
 
