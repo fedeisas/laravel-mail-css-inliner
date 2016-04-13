@@ -7,6 +7,19 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 class CssInlinerPlugin implements \Swift_Events_SendListener
 {
     /**
+     * @var array
+     */
+    protected $options;
+
+    /**
+     * @param array $options options defined in the configuration file.
+     */
+    public function __construct(array $options)
+    {
+        $this->options = $options;
+    }
+
+    /**
      * @param Swift_Events_SendEvent $evt
      */
     public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
@@ -14,10 +27,18 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $message = $evt->getMessage();
 
         $converter = new CssToInlineStyles();
-        $converter->setUseInlineStylesBlock();
-        $converter->setStripOriginalStyleTags();
 
-        $converter->setCleanup();
+        // Always enabled because there is no way to specify an external style sheet
+        // when using this plugin
+        $converter->setUseInlineStylesBlock();
+
+        if ($this->options['strip-styles']) {
+            $converter->setStripOriginalStyleTags();
+        }
+
+        if ($this->options['strip-classes']) {
+            $converter->setCleanup();
+        }
 
         if ($message->getContentType() === 'text/html' ||
             ($message->getContentType() === 'multipart/alternative' && $message->getBody()) ||
