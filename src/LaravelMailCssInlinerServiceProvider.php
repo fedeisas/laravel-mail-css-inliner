@@ -1,6 +1,7 @@
 <?php namespace Fedeisas\LaravelMailCssInliner;
 
 use Illuminate\Support\ServiceProvider;
+use Swift_Mailer;
 
 class LaravelMailCssInlinerServiceProvider extends ServiceProvider
 {
@@ -19,7 +20,9 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app['mailer']->getSwiftMailer()->registerPlugin(new CssInlinerPlugin());
+        $this->publishes([
+            __DIR__.'/../config/css-inliner.php' => config_path('css-inliner.php'),
+        ], 'config');
     }
 
     /**
@@ -29,16 +32,17 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Do nothing
-    }
+        $this->mergeConfigFrom(__DIR__.'/../config/css-inliner.php', 'css-inliner');
 
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return array();
+        $this->app->singleton('Fedeisas\LaravelMailCssInliner\CssInlinerPlugin', function ($app) {
+            $options = $app['config']->get('css-inliner');
+            return new CssInlinerPlugin($options);
+        });
+
+        $this->app->extend('swift.mailer', function (Swift_Mailer $swiftMailer, $app) {
+            $inlinerPlugin = $app->make('Fedeisas\LaravelMailCssInliner\CssInlinerPlugin');
+            $swiftMailer->registerPlugin($inlinerPlugin);
+            return $swiftMailer;
+        });
     }
 }

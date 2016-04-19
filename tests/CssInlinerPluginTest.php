@@ -4,14 +4,22 @@ use Fedeisas\LaravelMailCssInliner\CssInlinerPlugin;
 
 class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
 {
-
     protected $stubs;
+
+    protected $options;
+
+    protected static $stubDefinitions = array(
+        'plain-text', 'original-html', 'converted-html', 'converted-html-with-classes',
+        'converted-html-with-styles'
+    );
 
     public function setUp()
     {
-        $this->stubs['plain-text'] = file_get_contents(__DIR__.'/stubs/plain-text.stub');
-        $this->stubs['original-html'] = file_get_contents(__DIR__.'/stubs/original-html.stub');
-        $this->stubs['converted-html'] = file_get_contents(__DIR__.'/stubs/converted-html.stub');
+        foreach (self::$stubDefinitions as $stub) {
+            $this->stubs[$stub] = file_get_contents(__DIR__.'/stubs/'.$stub.'.stub');
+        }
+
+        $this->options = require(__DIR__.'/../config/css-inliner.php');
     }
 
     /** @test **/
@@ -19,7 +27,7 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPlugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
 
         $message = Swift_Message::newInstance();
 
@@ -34,11 +42,53 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test **/
+    public function itShouldConvertHtmlBodyKeepingClasses()
+    {
+        $this->options['strip-classes'] = false;
+
+        $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = Swift_Message::newInstance();
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+        $message->setSubject('Test');
+        $message->setBody($this->stubs['original-html'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals($this->stubs['converted-html-with-classes'], $message->getBody());
+    }
+
+    /** @test **/
+    public function itShouldConvertHtmlBodyKeepingStyles()
+    {
+        $this->options['strip-styles'] = false;
+
+        $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = Swift_Message::newInstance();
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+        $message->setSubject('Test');
+        $message->setBody($this->stubs['original-html'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals($this->stubs['converted-html-with-styles'], $message->getBody());
+    }
+
+    /** @test **/
     public function itShouldConvertHtmlBodyAndTextParts()
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPlugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
 
         $message = Swift_Message::newInstance();
 
@@ -61,7 +111,7 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPlugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
 
         $message = Swift_Message::newInstance();
 
@@ -82,7 +132,7 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     {
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
-        $mailer->registerPlugin(new CssInlinerPlugin());
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
 
         $message = Swift_Message::newInstance();
 
