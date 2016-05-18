@@ -50,7 +50,7 @@ This package needs Laravel 5.x
 ```json
 {
   "require": {
-        "fedeisas/laravel-mail-css-inliner": "~1.4"
+        "fedeisas/laravel-mail-css-inliner": "~1.5"
     }
 }
 ```
