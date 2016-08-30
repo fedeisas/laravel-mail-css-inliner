@@ -5,14 +5,6 @@ use Swift_Mailer;
 
 class LaravelMailCssInlinerServiceProvider extends ServiceProvider
 {
-
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = false;
-
     /**
      * Bootstrap the application events.
      *
@@ -35,8 +27,7 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/css-inliner.php', 'css-inliner');
 
         $this->app->singleton('Fedeisas\LaravelMailCssInliner\CssInlinerPlugin', function ($app) {
-            $options = $app['config']->get('css-inliner');
-            return new CssInlinerPlugin($options);
+            return new CssInlinerPlugin($app['config']->get('css-inliner'));
         });
 
         $this->app->extend('swift.mailer', function (Swift_Mailer $swiftMailer, $app) {
