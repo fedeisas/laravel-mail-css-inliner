@@ -7,68 +7,54 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 class CssInlinerPlugin implements \Swift_Events_SendListener
 {
     /**
-     * @var array
+     * @var CssToInlineStyles
      */
-    protected $options;
+    private $converter;
+
+    /**
+     * @var string
+     */
+    protected $css;
 
     /**
      * @param array $options options defined in the configuration file.
      */
     public function __construct(array $options)
     {
-        $this->options = $options;
-    }
-
-    /**
-     * @param Swift_Events_SendEvent $evt
-     */
-    public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
-    {
-        $message = $evt->getMessage();
-
-        $converter = new CssToInlineStyles();
-        $this->applySettings($converter);
-
-        if ($message->getContentType() === 'text/html' ||
-            ($message->getContentType() === 'multipart/alternative' && $message->getBody()) ||
-            ($message->getContentType() === 'multipart/mixed' && $message->getBody())
-        ) {
-            $converter->setHTML($message->getBody());
-            $message->setBody($converter->convert());
-        }
-
-        foreach ($message->getChildren() as $part) {
-            if (strpos($part->getContentType(), 'text/html') === 0) {
-                $converter->setHTML($part->getBody());
-                $part->setBody($converter->convert());
+        $this->converter = new CssToInlineStyles();
+        if (isset($options['css-files']) && count($options['css-files']) > 0) {
+            $this->css = '';
+            foreach ($options['css-files'] as $file) {
+                $this->css .= file_get_contents($file);
             }
         }
     }
 
     /**
-     * Applies the configuration settings.
-     *
-     * @param CssToInlineStyles $converter
+     * @param \Swift_Events_SendEvent $evt
      */
-    private function applySettings(CssToInlineStyles $converter)
+    public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
     {
-        // Always enabled because there is no way to specify an external style sheet
-        // when using this plugin
-        $converter->setUseInlineStylesBlock();
+        $message = $evt->getMessage();
 
-        if ($this->options['strip-styles']) {
-            $converter->setStripOriginalStyleTags();
+        if ($message->getContentType() === 'text/html'
+            || ($message->getContentType() === 'multipart/alternative' && $message->getBody())
+            || ($message->getContentType() === 'multipart/mixed' && $message->getBody())
+        ) {
+            $message->setBody($this->converter->convert($message->getBody(), $this->css));
         }
 
-        if ($this->options['strip-classes']) {
-            $converter->setCleanup();
+        foreach ($message->getChildren() as $part) {
+            if (strpos($part->getContentType(), 'text/html') === 0) {
+                $part->setBody($this->converter->convert($part->getBody(), $this->css));
+            }
         }
     }
 
     /**
      * Do nothing
      *
-     * @param Swift_Events_SendEvent $evt
+     * @param \Swift_Events_SendEvent $evt
      */
     public function sendPerformed(\Swift_Events_SendEvent $evt)
     {

@@ -4,29 +4,14 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
-	| Strip styles
+	| Css Files
 	|--------------------------------------------------------------------------
 	|
-	| Settings this to false prevents the inliner from removing the style
-	| definitions that have been inlined.
-	|
-	| Notice that media query styles are not inlined, and hence never
-	| stripped.
+	| Css file of your style for your emails
+	| The content of these files will be added directly into the inliner
 	|
 	*/
 
-	'strip-styles' => true,
-
-	/*
-	|--------------------------------------------------------------------------
-	| Remove classes
-	|--------------------------------------------------------------------------
-	|
-	| Settings this to false disables the removal of class attributes from
-	| your html elements (do not enable this if you use media queries)
-	|
-	*/
-
-	'strip-classes' => true,
+	'css-files' => [],
 
 ];
