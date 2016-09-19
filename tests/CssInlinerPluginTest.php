@@ -9,8 +9,8 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     protected $options;
 
     protected static $stubDefinitions = array(
-        'plain-text', 'original-html', 'converted-html', 'converted-html-with-classes',
-        'converted-html-with-styles'
+        'plain-text', 'original-html', 'original-html-with-css','converted-html',
+        'converted-html-with-css'
     );
 
     public function setUp()
@@ -42,10 +42,9 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test **/
-    public function itShouldConvertHtmlBodyKeepingClasses()
+    public function itShouldConvertHtmlBodyWithGivenCss()
     {
-        $this->options['strip-classes'] = false;
-
+        $this->options['css-files'] = [__DIR__ . '/css/test.css'];
         $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
 
         $mailer->registerPlugin(new CssInlinerPlugin($this->options));
@@ -55,32 +54,11 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
         $message->setFrom('test@example.com');
         $message->setTo('test2@example.com');
         $message->setSubject('Test');
-        $message->setBody($this->stubs['original-html'], 'text/html');
+        $message->setBody($this->stubs['original-html-with-css'], 'text/html');
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-classes'], $message->getBody());
-    }
-
-    /** @test **/
-    public function itShouldConvertHtmlBodyKeepingStyles()
-    {
-        $this->options['strip-styles'] = false;
-
-        $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
-
-        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
-
-        $message = Swift_Message::newInstance();
-
-        $message->setFrom('test@example.com');
-        $message->setTo('test2@example.com');
-        $message->setSubject('Test');
-        $message->setBody($this->stubs['original-html'], 'text/html');
-
-        $mailer->send($message);
-
-        $this->assertEquals($this->stubs['converted-html-with-styles'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html-with-css'], $message->getBody());
     }
 
     /** @test **/
