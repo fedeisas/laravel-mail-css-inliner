@@ -49,7 +49,7 @@ Begin by installing this package through Composer. Edit your project's `composer
 This package needs Laravel 5.x
 ```json
 {
-  "require": {
+    "require": {
         "fedeisas/laravel-mail-css-inliner": "~1.5"
     }
 }
@@ -62,12 +62,15 @@ $ composer update
 
 Once this operation completes, you must add the service provider. Open `app/config/app.php`, and add a new item to the providers array.
 ```php
-'Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider',
+'providers' => [
+    // ...
+    Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider::class,
+],
 ```
 
 At this point the inliner should be already working with the default options. If you want to fine-tune these options, you can do so by publishing the configuration file:
 ```bash
-$ php artisan vendor:publish --provider='Fedeisas\\LaravelMailCssInliner\\LaravelMailCssInlinerServiceProvider'
+$ php artisan vendor:publish --provider='Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider'
 ```
 and changing the settings on the generated `config/css-inliner.php` file.
 
