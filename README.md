@@ -36,6 +36,12 @@ Into this:
 ```html
 <html>
     <head>
+        <style>
+            h1 {
+                font-size: 24px;
+                color: #000;
+            }
+        </style>
     </head>
     <body>
         <h1 style="font-size: 24px; color: #000;">Hey you</h1>
