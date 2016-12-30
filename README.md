@@ -36,6 +36,12 @@ Into this:
 ```html
 <html>
     <head>
+        <style>
+            h1 {
+                font-size: 24px;
+                color: #000;
+            }
+        </style>
     </head>
     <body>
         <h1 style="font-size: 24px; color: #000;">Hey you</h1>
@@ -44,22 +50,12 @@ Into this:
 ```
 
 ## Installation
-Begin by installing this package through Composer. Edit your project's `composer.json` file to require `fedeisas/laravel-mail-css-inliner`.
-
 This package needs Laravel 5.x
-```json
-{
-    "require": {
-        "fedeisas/laravel-mail-css-inliner": "~1.5"
-    }
-}
-```
 
-Next, update Composer from the Terminal:
+Begin by installing this package through Composer. Require it directly from the Terminal to take the last stable version:
 ```bash
-$ composer update
+$ composer require `fedeisas/laravel-mail-css-inliner`
 ```
-
 Once this operation completes, you must add the service provider. Open `app/config/app.php`, and add a new item to the providers array.
 ```php
 'providers' => [
