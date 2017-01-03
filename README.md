@@ -54,7 +54,7 @@ This package needs Laravel 5.x
 
 Begin by installing this package through Composer. Require it directly from the Terminal to take the last stable version:
 ```bash
-$ composer require `fedeisas/laravel-mail-css-inliner`
+$ composer require fedeisas/laravel-mail-css-inliner
 ```
 Once this operation completes, you must add the service provider. Open `app/config/app.php`, and add a new item to the providers array.
 ```php
