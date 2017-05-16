@@ -22,12 +22,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function __construct(array $options)
     {
         $this->converter = new CssToInlineStyles();
-        if (isset($options['css-files']) && count($options['css-files']) > 0) {
-            $this->css = '';
-            foreach ($options['css-files'] as $file) {
-                $this->css .= file_get_contents($file);
-            }
-        }
+        $this->loadOptions($options);
     }
 
     /**
@@ -59,5 +54,18 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function sendPerformed(\Swift_Events_SendEvent $evt)
     {
         // Do Nothing
+    }
+
+    /**
+     * Load the options
+     * @param  array $options Options array
+     */
+    public function loadOptions($options){
+        if (isset($options['css-files']) && count($options['css-files']) > 0) {
+            $this->css = '';
+            foreach ($options['css-files'] as $file) {
+                $this->css .= file_get_contents($file);
+            }
+        }
     }
 }
