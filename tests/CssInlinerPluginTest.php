@@ -9,7 +9,7 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     protected $options;
 
     protected static $stubDefinitions = array(
-        'plain-text', 'original-html', 'original-html-with-css','converted-html',
+        'plain-text', 'original-html', 'original-html-with-css', 'original-html-with-link-css', 'converted-html',
         'converted-html-with-css'
     );
 
@@ -124,5 +124,26 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
         $children = $message->getChildren();
 
         $this->assertEquals($this->stubs['converted-html'], $children[0]->getBody());
+    }
+
+    /** @test **/
+    public function itShouldConvertHtmlBodyWithLinkCss()
+    {
+        $mailer = Swift_Mailer::newInstance(Swift_NullTransport::newInstance());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = Swift_Message::newInstance();
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+        $message->setSubject('Test');
+
+        // $message->setBody($body, 'text/html');
+        $message->setBody($this->stubs['original-html-with-link-css'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals($this->stubs['converted-html-with-css'], $message->getBody());
     }
 }

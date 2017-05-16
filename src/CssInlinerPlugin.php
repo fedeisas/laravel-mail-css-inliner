@@ -36,12 +36,14 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             || ($message->getContentType() === 'multipart/alternative' && $message->getBody())
             || ($message->getContentType() === 'multipart/mixed' && $message->getBody())
         ) {
-            $message->setBody($this->converter->convert($message->getBody(), $this->css));
+            $body = $this->loadCssFilesFromLinks($message->getBody());
+            $message->setBody($this->converter->convert($body, $this->css));
         }
 
         foreach ($message->getChildren() as $part) {
             if (strpos($part->getContentType(), 'text/html') === 0) {
-                $part->setBody($this->converter->convert($part->getBody(), $this->css));
+                $body = $this->loadCssFilesFromLinks($part->getBody());
+                $part->setBody($this->converter->convert($body, $this->css));
             }
         }
     }
@@ -67,5 +69,41 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
                 $this->css .= file_get_contents($file);
             }
         }
+    }
+
+    /**
+     * Find CSS stylesheet links and load them
+     * 
+     * Loads the body of the message and passes 
+     * any link stylesheets to $this->css
+     * Removes any link elements
+     * 
+     * @return string $message The message
+     */
+    public function loadCssFilesFromLinks($message){
+        $dom = new \DOMDocument();
+        $dom->loadHTML($message);
+        $link_tags = $dom->getElementsByTagName('link');
+
+        if(count($link_tags) > 0){
+            foreach($link_tags as $link_tag)
+            {
+                if($link_tag->getAttribute('rel') == "stylesheet"){
+                    $options['css-files'][] = $link_tag->getAttribute('href');                 
+
+                    // remove the link node
+                    $link_tag->parentNode->removeChild($link_tag);
+                }
+            }
+
+            if(isset($options)){
+                // reload the options
+                $this->loadOptions($options);               
+            }
+
+            return $dom->saveHTML();
+        }
+
+        return $message;
     }
 }
