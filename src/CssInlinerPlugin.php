@@ -85,12 +85,11 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $dom->loadHTML($message);
         $link_tags = $dom->getElementsByTagName('link');
 
-        if(count($link_tags) > 0){
+        if($link_tags->length > 0){
             foreach($link_tags as $link_tag)
             {
                 if($link_tag->getAttribute('rel') == "stylesheet"){
                     $options['css-files'][] = $link_tag->getAttribute('href');                 
-
                     // remove the link node
                     $link_tag->parentNode->removeChild($link_tag);
                 }
