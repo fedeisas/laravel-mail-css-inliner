@@ -22,12 +22,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function __construct(array $options)
     {
         $this->converter = new CssToInlineStyles();
-        if (isset($options['css-files']) && count($options['css-files']) > 0) {
-            $this->css = '';
-            foreach ($options['css-files'] as $file) {
-                $this->css .= file_get_contents($file);
-            }
-        }
+        $this->loadOptions($options);
     }
 
     /**
@@ -41,12 +36,14 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             || ($message->getContentType() === 'multipart/alternative' && $message->getBody())
             || ($message->getContentType() === 'multipart/mixed' && $message->getBody())
         ) {
-            $message->setBody($this->converter->convert($message->getBody(), $this->css));
+            $body = $this->loadCssFilesFromLinks($message->getBody());
+            $message->setBody($this->converter->convert($body, $this->css));
         }
 
         foreach ($message->getChildren() as $part) {
             if (strpos($part->getContentType(), 'text/html') === 0) {
-                $part->setBody($this->converter->convert($part->getBody(), $this->css));
+                $body = $this->loadCssFilesFromLinks($part->getBody());
+                $part->setBody($this->converter->convert($body, $this->css));
             }
         }
     }
@@ -59,5 +56,53 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function sendPerformed(\Swift_Events_SendEvent $evt)
     {
         // Do Nothing
+    }
+
+    /**
+     * Load the options
+     * @param  array $options Options array
+     */
+    public function loadOptions($options){
+        if (isset($options['css-files']) && count($options['css-files']) > 0) {
+            $this->css = '';
+            foreach ($options['css-files'] as $file) {
+                $this->css .= file_get_contents($file);
+            }
+        }
+    }
+
+    /**
+     * Find CSS stylesheet links and load them
+     * 
+     * Loads the body of the message and passes 
+     * any link stylesheets to $this->css
+     * Removes any link elements
+     * 
+     * @return string $message The message
+     */
+    public function loadCssFilesFromLinks($message){
+        $dom = new \DOMDocument();
+        $dom->loadHTML($message);
+        $link_tags = $dom->getElementsByTagName('link');
+
+        if($link_tags->length > 0){
+            do {
+                if($link_tags->item(0)->getAttribute('rel') == "stylesheet"){
+                    $options['css-files'][] = $link_tags->item(0)->getAttribute('href');
+
+                    // remove the link node
+                    $link_tags->item(0)->parentNode->removeChild($link_tags->item(0));
+                }
+            } while($link_tags->length > 0);
+
+            if(isset($options)){
+                // reload the options
+                $this->loadOptions($options);               
+            }
+
+            return $dom->saveHTML();
+        }
+
+        return $message;
     }
 }

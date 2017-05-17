@@ -15,7 +15,7 @@ The goal of this package is to automate the process of inlining that CSS before 
 ## How?
 Using a wonderful [CSS inliner package](https://github.com/tijsverkoyen/CssToInlineStyles) wraped in a SwiftMailer plugin and served as a Service Provider it justs works without any configuration.
 
-Turns:
+Turns style tag:
 ```html
 <html>
     <head>
@@ -25,6 +25,17 @@ Turns:
                 color: #000;
             }
         </style>
+    </head>
+    <body>
+        <h1>Hey you</h1>
+    </body>
+</html>
+```
+Or the link tag:
+```html
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="./tests/css/test.css">
     </head>
     <body>
         <h1>Hey you</h1>
