@@ -62,7 +62,8 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
      * Load the options
      * @param  array $options Options array
      */
-    public function loadOptions($options){
+    public function loadOptions($options)
+    {
         if (isset($options['css-files']) && count($options['css-files']) > 0) {
             $this->css = '';
             foreach ($options['css-files'] as $file) {
@@ -80,24 +81,25 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
      * 
      * @return string $message The message
      */
-    public function loadCssFilesFromLinks($message){
+    public function loadCssFilesFromLinks($message)
+    {
         $dom = new \DOMDocument();
         $dom->loadHTML($message);
         $link_tags = $dom->getElementsByTagName('link');
 
-        if($link_tags->length > 0){
+        if ($link_tags->length > 0) {
             do {
-                if($link_tags->item(0)->getAttribute('rel') == "stylesheet"){
+                if ($link_tags->item(0)->getAttribute('rel') == "stylesheet") {
                     $options['css-files'][] = $link_tags->item(0)->getAttribute('href');
 
                     // remove the link node
                     $link_tags->item(0)->parentNode->removeChild($link_tags->item(0));
                 }
-            } while($link_tags->length > 0);
+            } while ($link_tags->length > 0);
 
-            if(isset($options)){
+            if (isset($options)) {
                 // reload the options
-                $this->loadOptions($options);               
+                $this->loadOptions($options);
             }
 
             return $dom->saveHTML();

@@ -9,8 +9,9 @@ class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
     protected $options;
 
     protected static $stubDefinitions = array(
-        'plain-text', 'original-html', 'original-html-with-css', 'original-html-with-link-css', 'original-html-with-links-css', 'converted-html',
-        'converted-html-with-css', 'converted-html-with-links-css'
+        'plain-text', 'original-html', 'original-html-with-css',
+        'original-html-with-link-css', 'original-html-with-links-css',
+        'converted-html', 'converted-html-with-css', 'converted-html-with-links-css'
     );
 
     public function setUp()
