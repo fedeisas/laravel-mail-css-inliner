@@ -85,6 +85,8 @@ and changing the settings on the generated `config/css-inliner.php` file.
 ```bash
 $ composer install
 $ ./vendor/bin/phpunit
+$ ./vendor/bin/phpcs --standard=phpcs.xml ./src/
+$ ./vendor/bin/phpcs --standard=phpcs.xml ./tests/;
 ```
 In addition to a full test suite, there is Travis integration.
 
