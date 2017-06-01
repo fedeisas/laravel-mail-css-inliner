@@ -84,7 +84,13 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function loadCssFilesFromLinks($message)
     {
         $dom = new \DOMDocument();
+        // set error level
+        $internalErrors = libxml_use_internal_errors(true);
+        
         $dom->loadHTML($message);
+        
+        // Restore error level
+        libxml_use_internal_errors($internalErrors);
         $link_tags = $dom->getElementsByTagName('link');
 
         if ($link_tags->length > 0) {
