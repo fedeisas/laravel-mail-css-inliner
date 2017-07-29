@@ -15,17 +15,26 @@
         "tijsverkoyen/css-to-inline-styles": "~2.0"
     },
     "require-dev" : {
-        "jakub-onderka/php-parallel-lint": "0.8.*",
-        "jakub-onderka/php-console-highlighter": "0.3.*",
-        "phpmd/phpmd": "~1.5",
-        "phpunit/phpunit": "~4.0",
-        "satooshi/php-coveralls": "~0.7@dev",
-        "squizlabs/php_codesniffer": "~1.5",
+        "phpunit/phpunit": "~5.7",
+        "squizlabs/php_codesniffer": "^2.3",
         "swiftmailer/swiftmailer": "~5.0"
     },
     "autoload": {
         "psr-4": {
             "Fedeisas\\LaravelMailCssInliner\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "check-style": "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
+        "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests"
+    },
+    "config": {
+        "sort-packages": true
     }
 }

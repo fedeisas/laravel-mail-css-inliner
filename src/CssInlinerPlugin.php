@@ -74,11 +74,11 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
 
     /**
      * Find CSS stylesheet links and load them
-     * 
-     * Loads the body of the message and passes 
+     *
+     * Loads the body of the message and passes
      * any link stylesheets to $this->css
      * Removes any link elements
-     * 
+     *
      * @return string $message The message
      */
     public function loadCssFilesFromLinks($message)
