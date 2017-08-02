@@ -74,11 +74,11 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
 
     /**
      * Find CSS stylesheet links and load them
-     * 
-     * Loads the body of the message and passes 
+     *
+     * Loads the body of the message and passes
      * any link stylesheets to $this->css
      * Removes any link elements
-     * 
+     *
      * @return string $message The message
      */
     public function loadCssFilesFromLinks($message)
@@ -86,17 +86,21 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         $dom = new \DOMDocument();
         // set error level
         $internalErrors = libxml_use_internal_errors(true);
-        
+
         $dom->loadHTML($message);
-        
+
         // Restore error level
         libxml_use_internal_errors($internalErrors);
         $link_tags = $dom->getElementsByTagName('link');
 
         if ($link_tags->length > 0) {
             do {
+
                 if ($link_tags->item(0)->getAttribute('rel') == "stylesheet") {
-                    $options['css-files'][] = $link_tags->item(0)->getAttribute('href');
+                    $css_file = $link_tags->item(0)->getAttribute('href');
+                    $public_path = preg_replace('/\//', '\/', public_path());
+
+                    $options['css-files'][] = preg_match("/^$public_path/", $css_file) ? $css_file : public_path($css_file);
 
                     // remove the link node
                     $link_tags->item(0)->parentNode->removeChild($link_tags->item(0));
