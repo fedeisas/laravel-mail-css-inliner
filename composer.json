@@ -36,5 +36,12 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fedeisas\\LaravelMailCssInliner\\LaravelMailCssInlinerServiceProvider"
+            ]
+        }
     }
 }
