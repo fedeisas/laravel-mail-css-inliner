@@ -27,5 +27,12 @@
         "psr-4": {
             "Fedeisas\\LaravelMailCssInliner\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fedeisas\\LaravelMailCssInliner\\LaravelMailCssInlinerServiceProvider"
+            ]
+        }
     }
 }
