@@ -21,7 +21,8 @@
         "phpunit/phpunit": "~4.0",
         "satooshi/php-coveralls": "~0.7@dev",
         "squizlabs/php_codesniffer": "~1.5",
-        "swiftmailer/swiftmailer": "~5.0"
+        "swiftmailer/swiftmailer": "~5.0",
+        "laravel/laravel": "~5.0"
     },
     "autoload": {
         "psr-4": {

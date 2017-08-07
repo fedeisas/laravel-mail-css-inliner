@@ -97,7 +97,12 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             do {
                 if ($link_tags->item(0)->getAttribute('rel') == "stylesheet") {
                     $css_file = $link_tags->item(0)->getAttribute('href');
-                    $public_path = preg_replace('/\//', '\/', public_path());
+
+                    if(function_exists('public_path')) {
+                        $public_path = preg_replace('/\//', '\/', public_path());
+                    } else {
+                        $public_path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'public';
+                    }
 
                     if(preg_match("/^$public_path/", $css_file)) {
                         $options['css-files'][] = $css_file;
