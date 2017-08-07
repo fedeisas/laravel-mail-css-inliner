@@ -14,7 +14,7 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/../config/css-inliner.php' => config_path('css-inliner.php'),
+            __DIR__ . '/../config/css-inliner.php' => base_path('config/css-inliner.php'),
         ], 'config');
     }
 
