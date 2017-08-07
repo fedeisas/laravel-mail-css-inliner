@@ -1,26 +1,43 @@
 <?php
 
-use Fedeisas\LaravelMailCssInliner\CssInlinerPlugin;
+namespace Tests;
 
-class CssInlinerPluginTest extends PHPUnit_Framework_TestCase
+use Fedeisas\LaravelMailCssInliner\CssInlinerPlugin;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_NullTransport;
+use PHPUnit\Framework\TestCase;
+
+class CssInlinerPluginTest extends TestCase
 {
+    /**
+     * @var array
+     */
     protected $stubs;
 
+    /**
+     * @var array
+     */
     protected $options;
 
-    protected static $stubDefinitions = array(
-        'plain-text', 'original-html', 'original-html-with-css',
-        'original-html-with-link-css', 'original-html-with-links-css',
-        'converted-html', 'converted-html-with-css', 'converted-html-with-links-css'
-    );
+    protected static $stubDefinitions = [
+        'plain-text',
+        'original-html',
+        'original-html-with-css',
+        'original-html-with-link-css',
+        'original-html-with-links-css',
+        'converted-html',
+        'converted-html-with-css',
+        'converted-html-with-links-css',
+    ];
 
     public function setUp()
     {
         foreach (self::$stubDefinitions as $stub) {
-            $this->stubs[$stub] = file_get_contents(__DIR__.'/stubs/'.$stub.'.stub');
+            $this->stubs[$stub] = file_get_contents(__DIR__ . '/stubs/' . $stub . '.stub');
         }
 
-        $this->options = require(__DIR__.'/../config/css-inliner.php');
+        $this->options = require(__DIR__ . '/../config/css-inliner.php');
     }
 
     /** @test **/
