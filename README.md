@@ -14,6 +14,7 @@ The goal of this package is to automate the process of inlining that CSS before 
 
 ## How?
 Using a wonderful [CSS inliner package](https://github.com/tijsverkoyen/CssToInlineStyles) wrapped in a SwiftMailer plugin and served as a Service Provider it just works without any configuration.
+Since this is a SwiftMailer plugin, it will automatically inline your css when parsing an email template. You don't have to do anything!
 
 Turns style tag:
 ```html
