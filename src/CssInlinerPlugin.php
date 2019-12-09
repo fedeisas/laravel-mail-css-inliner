@@ -97,10 +97,10 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             do {
                 if ($link_tags->item(0)->getAttribute('rel') == "stylesheet") {
                     $options['css-files'][] = $link_tags->item(0)->getAttribute('href');
-
-                    // remove the link node
-                    $link_tags->item(0)->parentNode->removeChild($link_tags->item(0));
                 }
+                
+                // remove the link node in any situation, otherwise we got infinite cycle...
+                $link_tags->item(0)->parentNode->removeChild($link_tags->item(0));
             } while ($link_tags->length > 0);
 
             if (isset($options)) {
