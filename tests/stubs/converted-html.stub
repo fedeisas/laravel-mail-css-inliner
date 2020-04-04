@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
-<head><style>
+    <head>
+        <style>
             .block {
                 width: 100px;
                 height: 20px;
@@ -8,19 +9,20 @@
             div.block ul li.small {
                 margin: 10px;
             }
-        </style></head>
-<body>
+        </style>
+    </head>
+    <body>
         <div class="block" style="width: 100px; height: 20px;">
             text
 
             <ul>
-<li>
+                <li>
                     Big list
                 </li>
                 <li class="small" style="margin: 10px;">
                     Small list
                 </li>
             </ul>
-</div>
+        </div>
     </body>
 </html>
