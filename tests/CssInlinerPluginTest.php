@@ -39,7 +39,7 @@ class CssInlinerPluginTest extends TestCase
     public function setUp(): void
     {
         foreach (self::$stubDefinitions as $stub) {
-            $this->stubs[$stub] = trim(file_get_contents(__DIR__ . '/stubs/' . $stub . '.stub'));
+            $this->stubs[$stub] = $this->normalize(file_get_contents(__DIR__ . '/stubs/' . $stub . '.stub'));
         }
 
         $this->options = require(__DIR__ . '/../config/css-inliner.php');
@@ -60,7 +60,7 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html'], $this->normalize($message->getBody()));
     }
 
     /** @test **/
@@ -79,7 +79,7 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-css'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html-with-css'], $this->normalize($message->getBody()));
     }
 
     /** @test **/
@@ -100,7 +100,7 @@ class CssInlinerPluginTest extends TestCase
 
         $children = $message->getChildren();
 
-        $this->assertEquals($this->stubs['converted-html'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html'], $this->normalize($message->getBody()));
         $this->assertEquals($this->stubs['plain-text'], $children[0]->getBody());
     }
 
@@ -141,7 +141,7 @@ class CssInlinerPluginTest extends TestCase
 
         $children = $message->getChildren();
 
-        $this->assertEquals($this->stubs['converted-html'], $children[0]->getBody());
+        $this->assertEquals($this->stubs['converted-html'], $this->normalize($children[0]->getBody()));
     }
 
     /** @test **/
@@ -160,7 +160,7 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-link-css'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html-with-link-css'], $this->normalize($message->getBody()));
     }
 
     /** @test **/
@@ -179,7 +179,7 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-links-css'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html-with-links-css'], $this->normalize($message->getBody()));
     }
 
     /** @test **/
@@ -198,7 +198,7 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-non-stylesheet-link'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html-with-non-stylesheet-link'], $this->normalize($message->getBody()));
     }
 
     /** @test **/
@@ -217,6 +217,25 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-mixed-type-links'], $message->getBody());
+        $this->assertEquals($this->stubs['converted-html-with-mixed-type-links'], $this->normalize($message->getBody()));
+    }
+
+    protected function normalize(string $html): string
+    {
+        $search = [
+            '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+            '/[^\S ]+\</s',     // strip whitespaces before tags, except space
+            '/(\s)+/s',         // shorten multiple whitespace sequences
+            '/<!--(.|\s)*?-->/', // Remove HTML comments
+        ];
+
+        $replace = [
+            '>',
+            '<',
+            '\\1',
+            '',
+        ];
+
+        return trim(preg_replace($search, $replace, $html));
     }
 }
