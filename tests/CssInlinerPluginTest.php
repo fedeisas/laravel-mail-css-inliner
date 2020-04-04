@@ -21,15 +21,19 @@ class CssInlinerPluginTest extends TestCase
     protected $options;
 
     protected static $stubDefinitions = [
-        'plain-text',
-        'original-html',
-        'original-html-with-css',
-        'original-html-with-link-css',
-        'original-html-with-links-css',
         'converted-html',
         'converted-html-with-css',
         'converted-html-with-link-css',
         'converted-html-with-links-css',
+        'converted-html-with-mixed-type-links',
+        'converted-html-with-non-stylesheet-link',
+        'original-html',
+        'original-html-with-css',
+        'original-html-with-link-css',
+        'original-html-with-links-css',
+        'original-html-with-mixed-type-links',
+        'original-html-with-non-stylesheet-link',
+        'plain-text',
     ];
 
     public function setUp(): void
@@ -176,5 +180,43 @@ class CssInlinerPluginTest extends TestCase
         $mailer->send($message);
 
         $this->assertEquals($this->stubs['converted-html-with-links-css'], $message->getBody());
+    }
+
+    /** @test **/
+    public function itShouldWorkWithNonStylesheetLinks()
+    {
+        $mailer = new Swift_Mailer(new Swift_NullTransport());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = new Swift_Message('Test');
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+
+        $message->setBody($this->stubs['original-html-with-non-stylesheet-link'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals($this->stubs['converted-html-with-non-stylesheet-link'], $message->getBody());
+    }
+
+    /** @test **/
+    public function itShouldWorkWithMixedTypeLinks()
+    {
+        $mailer = new Swift_Mailer(new Swift_NullTransport());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = new Swift_Message('Test');
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+
+        $message->setBody($this->stubs['original-html-with-mixed-type-links'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals($this->stubs['converted-html-with-mixed-type-links'], $message->getBody());
     }
 }
