@@ -253,25 +253,12 @@ class CssInlinerPluginTest extends TestCase
         $normalizedHtml = trim($document->saveHTML());
 
         $search = [
-    //            '/(?:<html>)(\s)+(?:<head>)/s', // libxml handles this different across platforms
-                '/(?:<head>)(\s)+(?:<\/head>)/s', // libxml handles this different across platforms
-//                '/(?:<\/head>)(\s)+(?:<style>)/s', // libxml handles this different across platforms
-    //            '/(?:<\/head>)(\s)+(?:<style>)/s', // libxml handles this different across platforms
-    //            '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
-    //            '/[^\S ]+\</s',     // strip whitespaces before tags, except space
-    //            '/(\s)+/s',         // shorten multiple whitespace sequences
-    //            '/<!--(.|\s)*?-->/', // Remove HTML comments
-            ];
+            '/(?:<head>)(\s)+(?:<\/head>)/s', // libxml handles this different across platforms
+        ];
 
-        $replace = [
-    //            '<html><head>',
-                '<head></head>',
-//                '</head><style>',
-    //            '>',
-    //            '<',
-    //            '\\1',
-    //            '',
-            ];
+        $replace = [,
+            '<head></head>',
+        ];
 
         return trim(preg_replace($search, $replace, $normalizedHtml));
     }
