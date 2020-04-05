@@ -83,30 +83,35 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
      */
     public function loadCssFilesFromLinks($message)
     {
+        $options['css-files'] = [];
+
         $dom = new \DOMDocument();
         // set error level
         $internalErrors = libxml_use_internal_errors(true);
-        
+
         $dom->loadHTML($message);
-        
+
         // Restore error level
         libxml_use_internal_errors($internalErrors);
         $link_tags = $dom->getElementsByTagName('link');
 
-        if ($link_tags->length > 0) {
-            do {
-                if ($link_tags->item(0)->getAttribute('rel') == "stylesheet") {
-                    $options['css-files'][] = $link_tags->item(0)->getAttribute('href');
-
-                    // remove the link node
-                    $link_tags->item(0)->parentNode->removeChild($link_tags->item(0));
-                }
-            } while ($link_tags->length > 0);
-
-            if (isset($options)) {
-                // reload the options
-                $this->loadOptions($options);
+        /** @var \DOMElement $link */
+        foreach ($link_tags as $link) {
+            if ($link->getAttribute('rel') === 'stylesheet') {
+                $options['css-files'][] = $link->getAttribute('href');
             }
+        }
+
+        $link_tags = $dom->getElementsByTagName('link');
+        for ($i = $link_tags->length; --$i >= 0;) {
+            $link = $link_tags->item($i);
+            if ($link->getAttribute('rel') === 'stylesheet') {
+                $link->parentNode->removeChild($link);
+            }
+        }
+
+        if (count($options['css-files'])) {
+            $this->loadOptions($options);
 
             return $dom->saveHTML();
         }

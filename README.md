@@ -1,8 +1,7 @@
 Laravel Mail CSS Inliner
 ========================
 
-[![Travis Badge](https://secure.travis-ci.org/fedeisas/laravel-mail-css-inliner.png)](http://travis-ci.org/fedeisas/laravel-mail-css-inliner)
-[![Coverage Status](https://coveralls.io/repos/fedeisas/laravel-mail-css-inliner/badge.png)](https://coveralls.io/r/fedeisas/laravel-mail-css-inliner)
+![](https://github.com/realeflow/sitebuilder/workflows/CI/badge.svg)
 [![Latest Stable Version](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/v/stable.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
 [![Latest Unstable Version](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/v/unstable.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
 [![Total Downloads](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/downloads.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
@@ -62,19 +61,11 @@ Into this:
 ```
 
 ## Installation
-This package needs Laravel 5.x or 6.x.
+This package needs Laravel 7.x.
 
 Begin by installing this package through Composer. Require it directly from the Terminal to take the last stable version:
 ```bash
 $ composer require fedeisas/laravel-mail-css-inliner
-```
-
-Once this operation completes, you must add the service provider if you are on Laravel 5.4 or older. Open `app/config/app.php`, and add a new item to the providers array.
-```php
-'providers' => [
-    // ...
-    Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider::class,
-],
 ```
 
 At this point the inliner should be already working with the default options. If you want to fine-tune these options, you can do so by publishing the configuration file:
@@ -87,10 +78,7 @@ and changing the settings on the generated `config/css-inliner.php` file.
 ```bash
 $ composer install
 $ ./vendor/bin/phpunit
-$ ./vendor/bin/phpcs --standard=phpcs.xml ./src/
-$ ./vendor/bin/phpcs --standard=phpcs.xml ./tests/;
 ```
-In addition to a full test suite, there is Travis integration.
 
 ## Found a bug?
 Please, let me know! Send a pull request or a patch. Questions? Ask! I will respond to all filed issues.
