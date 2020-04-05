@@ -9,9 +9,18 @@
             div.block ul li.small {
                 margin: 10px;
             }
+            .picture-feed {
+                width: 50%;
+            }
+            @media (max-width: 768px) {
+                .picture-feed {
+                    width: 100%;
+                }
+            }
         </style>
     </head>
     <body>
+        <div><img class="picture-feed" src="foo.jpg" style="width: 50%;"></div>
         <div class="block" style="width: 100px; height: 20px;">
             text
 

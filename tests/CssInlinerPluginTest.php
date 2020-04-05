@@ -60,7 +60,7 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertXmlStringEqualsXmlString(
+        $this->assertEquals(
             $this->stubs['converted-html'],
             $this->normalize($message->getBody())
         );
@@ -106,10 +106,7 @@ class CssInlinerPluginTest extends TestCase
 
         $children = $message->getChildren();
 
-        $this->assertXmlStringEqualsXmlString(
-            $this->stubs['converted-html'],
-            $this->normalize($message->getBody())
-        );
+        $this->assertEquals($this->stubs['converted-html'], $this->normalize($message->getBody()));
         $this->assertEquals($this->stubs['plain-text'], $children[0]->getBody());
     }
 
@@ -150,10 +147,7 @@ class CssInlinerPluginTest extends TestCase
 
         $children = $message->getChildren();
 
-        $this->assertXmlStringEqualsXmlString(
-            $this->stubs['converted-html'],
-            $this->normalize($children[0]->getBody())
-        );
+        $this->assertEquals($this->stubs['converted-html'], $this->normalize($children[0]->getBody()));
     }
 
     /** @test **/
@@ -256,7 +250,7 @@ class CssInlinerPluginTest extends TestCase
             '/(?:<head>)(\s)+(?:<\/head>)/s', // libxml handles this different across platforms
         ];
 
-        $replace = [,
+        $replace = [
             '<head></head>',
         ];
 
