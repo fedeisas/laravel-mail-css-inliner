@@ -2,6 +2,7 @@ Laravel Mail CSS Inliner
 ========================
 
 ![](https://github.com/realeflow/sitebuilder/workflows/CI/badge.svg)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=fedeisas/laravel-mail-css-inliner&identifier=16568832)](https://dependabot.com)
 [![Latest Stable Version](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/v/stable.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
 [![Latest Unstable Version](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/v/unstable.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
 [![Total Downloads](https://poser.pugx.org/fedeisas/laravel-mail-css-inliner/downloads.png)](https://packagist.org/packages/fedeisas/laravel-mail-css-inliner)
