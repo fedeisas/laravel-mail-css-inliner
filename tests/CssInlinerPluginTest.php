@@ -60,7 +60,10 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html'], $this->normalize($message->getBody()));
+        $this->assertXmlStringEqualsXmlString(
+            $this->stubs['converted-html'],
+            $this->normalize($message->getBody())
+        );
     }
 
     /** @test **/
@@ -79,7 +82,10 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-css'], $this->normalize($message->getBody()));
+        $this->assertXmlStringEqualsXmlString(
+            $this->stubs['converted-html-with-css'],
+            $this->normalize($message->getBody())
+        );
     }
 
     /** @test **/
@@ -100,7 +106,10 @@ class CssInlinerPluginTest extends TestCase
 
         $children = $message->getChildren();
 
-        $this->assertEquals($this->stubs['converted-html'], $this->normalize($message->getBody()));
+        $this->assertXmlStringEqualsXmlString(
+            $this->stubs['converted-html'],
+            $this->normalize($message->getBody())
+        );
         $this->assertEquals($this->stubs['plain-text'], $children[0]->getBody());
     }
 
@@ -141,7 +150,10 @@ class CssInlinerPluginTest extends TestCase
 
         $children = $message->getChildren();
 
-        $this->assertEquals($this->stubs['converted-html'], $this->normalize($children[0]->getBody()));
+        $this->assertXmlStringEqualsXmlString(
+            $this->stubs['converted-html'],
+            $this->normalize($children[0]->getBody())
+        );
     }
 
     /** @test **/
@@ -160,7 +172,10 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-link-css'], $this->normalize($message->getBody()));
+        $this->assertXmlStringEqualsXmlString(
+            $this->stubs['converted-html-with-link-css'],
+            $this->normalize($message->getBody())
+        );
     }
 
     /** @test **/
@@ -179,7 +194,10 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-links-css'], $this->normalize($message->getBody()));
+        $this->assertXmlStringEqualsXmlString(
+            $this->stubs['converted-html-with-links-css'],
+            $this->normalize($message->getBody())
+        );
     }
 
     /** @test **/
@@ -198,7 +216,10 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-non-stylesheet-link'], $this->normalize($message->getBody()));
+        $this->assertEquals(
+            $this->stubs['converted-html-with-non-stylesheet-link'],
+            $this->normalize($message->getBody())
+        );
     }
 
     /** @test **/
@@ -217,25 +238,41 @@ class CssInlinerPluginTest extends TestCase
 
         $mailer->send($message);
 
-        $this->assertEquals($this->stubs['converted-html-with-mixed-type-links'], $this->normalize($message->getBody()));
+        $this->assertEquals(
+            $this->stubs['converted-html-with-mixed-type-links'],
+            $this->normalize($message->getBody())
+        );
     }
 
     protected function normalize(string $html): string
     {
+        $document = new \DomDocument();
+        $document->loadHTML($html);
+        $document->preserveWhiteSpace = false;
+
+        $normalizedHtml = trim($document->saveHTML());
+
         $search = [
-            '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
-            '/[^\S ]+\</s',     // strip whitespaces before tags, except space
-            '/(\s)+/s',         // shorten multiple whitespace sequences
-            '/<!--(.|\s)*?-->/', // Remove HTML comments
-        ];
+    //            '/(?:<html>)(\s)+(?:<head>)/s', // libxml handles this different across platforms
+                '/(?:<head>)(\s)+(?:<\/head>)/s', // libxml handles this different across platforms
+//                '/(?:<\/head>)(\s)+(?:<style>)/s', // libxml handles this different across platforms
+    //            '/(?:<\/head>)(\s)+(?:<style>)/s', // libxml handles this different across platforms
+    //            '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+    //            '/[^\S ]+\</s',     // strip whitespaces before tags, except space
+    //            '/(\s)+/s',         // shorten multiple whitespace sequences
+    //            '/<!--(.|\s)*?-->/', // Remove HTML comments
+            ];
 
         $replace = [
-            '>',
-            '<',
-            '\\1',
-            '',
-        ];
+    //            '<html><head>',
+                '<head></head>',
+//                '</head><style>',
+    //            '>',
+    //            '<',
+    //            '\\1',
+    //            '',
+            ];
 
-        return trim(preg_replace($search, $replace, $html));
+        return trim(preg_replace($search, $replace, $normalizedHtml));
     }
 }
