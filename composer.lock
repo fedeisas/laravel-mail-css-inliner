@@ -75,16 +75,16 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v7.5.1",
+            "version": "v7.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "2db7e8a936cc09e396d14902178ea177f4dc42ac"
+                "reference": "69a40779d8fc43e3f43da973b9c0c20bdbd81203"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/2db7e8a936cc09e396d14902178ea177f4dc42ac",
-                "reference": "2db7e8a936cc09e396d14902178ea177f4dc42ac",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/69a40779d8fc43e3f43da973b9c0c20bdbd81203",
+                "reference": "69a40779d8fc43e3f43da973b9c0c20bdbd81203",
                 "shasum": ""
             },
             "require": {
@@ -115,20 +115,20 @@
             ],
             "description": "The Illuminate Contracts package.",
             "homepage": "https://laravel.com",
-            "time": "2020-04-04T15:13:36+00:00"
+            "time": "2020-04-09T15:01:22+00:00"
         },
         {
             "name": "illuminate/support",
-            "version": "v7.5.1",
+            "version": "v7.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "99b3538c63b3ce5374d5f8fad181fac07efaedec"
+                "reference": "8cf661b620279503f2ca64447de04a34624a7d5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/99b3538c63b3ce5374d5f8fad181fac07efaedec",
-                "reference": "99b3538c63b3ce5374d5f8fad181fac07efaedec",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/8cf661b620279503f2ca64447de04a34624a7d5a",
+                "reference": "8cf661b620279503f2ca64447de04a34624a7d5a",
                 "shasum": ""
             },
             "require": {
@@ -177,7 +177,7 @@
             ],
             "description": "The Illuminate Support package.",
             "homepage": "https://laravel.com",
-            "time": "2020-04-06T13:34:26+00:00"
+            "time": "2020-04-23T17:41:14+00:00"
         },
         {
             "name": "nesbot/carbon",
