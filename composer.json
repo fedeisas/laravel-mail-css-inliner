@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.2.5",
         "ext-dom": "*",
-        "illuminate/support": "^7.4",
+        "illuminate/support": "^7.4|^8.0",
         "tijsverkoyen/css-to-inline-styles": "~2.0"
     },
     "require-dev": {
