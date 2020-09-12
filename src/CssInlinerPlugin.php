@@ -9,12 +9,17 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     /**
      * @var CssToInlineStyles
      */
-    private $converter;
+    protected $converter;
 
     /**
-     * @var string
+     * @var string[]
      */
-    protected $css;
+    protected $cssCache;
+
+    /**
+     * @var array
+     */
+    protected $options;
 
     /**
      * @param array $options options defined in the configuration file.
@@ -22,7 +27,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     public function __construct(array $options)
     {
         $this->converter = new CssToInlineStyles();
-        $this->loadOptions($options);
+        $this->options = $options;
     }
 
     /**
@@ -36,14 +41,16 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             || ($message->getContentType() === 'multipart/alternative' && $message->getBody())
             || ($message->getContentType() === 'multipart/mixed' && $message->getBody())
         ) {
-            $body = $this->loadCssFilesFromLinks($message->getBody());
-            $message->setBody($this->converter->convert($body, $this->css));
+            [$body, $cssResources] = $this->messageSieve($message->getBody());
+            $css = $this->fetchCss($cssResources);
+            $message->setBody($this->converter->convert($body, $css));
         }
 
         foreach ($message->getChildren() as $part) {
             if (strpos($part->getContentType(), 'text/html') === 0) {
-                $body = $this->loadCssFilesFromLinks($part->getBody());
-                $part->setBody($this->converter->convert($body, $this->css));
+                [$body, $cssResources] = $this->messageSieve($part->getBody());
+                $css = $this->fetchCss($cssResources);
+                $part->setBody($this->converter->convert($body, $css));
             }
         }
     }
@@ -58,37 +65,37 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         // Do Nothing
     }
 
-    /**
-     * Load the options
-     * @param  array $options Options array
-     */
-    public function loadOptions($options)
+    protected function fetchCss(array $cssResources): string
     {
-        if (isset($options['css-files']) && count($options['css-files']) > 0) {
-            $this->css = '';
-            foreach ($options['css-files'] as $fileUrl) {
-                // Fix relative protocols on hrefs. Assume https.
-                if (substr($fileUrl, 0, 2) === '//') {
-                    $fileUrl = 'https:' . $fileUrl;
-                }
-
-                $this->css .= file_get_contents($fileUrl);
+        $output = '';
+        foreach ($cssResources as $cssResource) {
+            if (isset($this->cssCache[$cssResource])) {
+                $output .= $this->cssCache[$cssResource];
+                continue;
             }
+            $filename = $cssResource;
+
+            // Fix relative protocols on hrefs. Assume https.
+            if (substr($filename, 0, 2) === '//') {
+                $filename = 'https:' . $filename;
+            }
+
+            $content = file_get_contents($filename);
+            $this->cssCache[$cssResource] = $content;
+            $output .= $this->cssCache[$cssResource];
         }
+
+        return $output;
     }
 
-    /**
-     * Find CSS stylesheet links and load them
-     *
-     * Loads the body of the message and passes
-     * any link stylesheets to $this->css
-     * Removes any link elements
-     *
-     * @return string $message The message
-     */
-    public function loadCssFilesFromLinks($message)
+    protected function messageSieve(string $message): array
     {
-        $options['css-files'] = [];
+        $cssResources = [];
+
+        // Initialize with config defaults, if any
+        if (isset($this->options['css-files'])) {
+            $cssResources = $this->options['css-files'];
+        }
 
         $dom = new \DOMDocument();
         // set error level
@@ -103,7 +110,7 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         /** @var \DOMElement $link */
         foreach ($link_tags as $link) {
             if ($link->getAttribute('rel') === 'stylesheet') {
-                $options['css-files'][] = $link->getAttribute('href');
+                array_push($cssResources, $link->getAttribute('href'));
             }
         }
 
@@ -115,12 +122,10 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             }
         }
 
-        if (count($options['css-files'])) {
-            $this->loadOptions($options);
-
-            return $dom->saveHTML();
+        if (count($cssResources)) {
+            return [$dom->saveHTML(), $cssResources];
         }
 
-        return $message;
+        return [$message, []];
     }
 }
