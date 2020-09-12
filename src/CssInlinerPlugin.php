@@ -42,14 +42,14 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
             || ($message->getContentType() === 'multipart/mixed' && $message->getBody())
         ) {
             [$body, $cssResources] = $this->messageSieve($message->getBody());
-            $css = $this->fetchCss($cssResources);
+            $css = $this->concatCss($cssResources);
             $message->setBody($this->converter->convert($body, $css));
         }
 
         foreach ($message->getChildren() as $part) {
             if (strpos($part->getContentType(), 'text/html') === 0) {
                 [$body, $cssResources] = $this->messageSieve($part->getBody());
-                $css = $this->fetchCss($cssResources);
+                $css = $this->concatCss($cssResources);
                 $part->setBody($this->converter->convert($body, $css));
             }
         }
@@ -65,27 +65,36 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
         // Do Nothing
     }
 
-    protected function fetchCss(array $cssResources): string
+    protected function concatCss(array $cssResources): string
     {
         $output = '';
         foreach ($cssResources as $cssResource) {
-            if (isset($this->cssCache[$cssResource])) {
-                $output .= $this->cssCache[$cssResource];
-                continue;
-            }
-            $filename = $cssResource;
-
-            // Fix relative protocols on hrefs. Assume https.
-            if (substr($filename, 0, 2) === '//') {
-                $filename = 'https:' . $filename;
-            }
-
-            $content = file_get_contents($filename);
-            $this->cssCache[$cssResource] = $content;
-            $output .= $this->cssCache[$cssResource];
+            $output.= $this->fetchCss($cssResource);
         }
 
         return $output;
+    }
+
+    protected function fetchCss(string $filename): string
+    {
+        if (isset($this->cssCache[$filename])) {
+            return $this->cssCache[$filename];
+        }
+
+        $fixedFilename = $filename;
+        // Fix relative protocols on hrefs. Assume https.
+        if (substr($filename, 0, 2) === '//') {
+            $fixedFilename = 'https:' . $filename;
+        }
+
+        $content = file_get_contents($fixedFilename);
+        if (! $content) {
+            return '';
+        }
+
+        $this->cssCache[$filename] = $content;
+
+        return $content;
     }
 
     protected function messageSieve(string $message): array
