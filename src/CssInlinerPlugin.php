@@ -66,8 +66,13 @@ class CssInlinerPlugin implements \Swift_Events_SendListener
     {
         if (isset($options['css-files']) && count($options['css-files']) > 0) {
             $this->css = '';
-            foreach ($options['css-files'] as $file) {
-                $this->css .= file_get_contents($file);
+            foreach ($options['css-files'] as $fileUrl) {
+                // Fix relative protocols on hrefs. Assume https.
+                if (substr($fileUrl, 0, 2) === '//') {
+                    $fileUrl = 'https:' . $fileUrl;
+                }
+
+                $this->css .= file_get_contents($fileUrl);
             }
         }
     }
