@@ -24,12 +24,16 @@ class CssInlinerPluginTest extends TestCase
         'converted-html',
         'converted-html-with-css',
         'converted-html-with-link-css',
+        'converted-html-with-link-external',
+        'converted-html-with-link-relative-external',
         'converted-html-with-links-css',
         'converted-html-with-mixed-type-links',
         'converted-html-with-non-stylesheet-link',
         'original-html',
         'original-html-with-css',
         'original-html-with-link-css',
+        'original-html-with-link-external',
+        'original-html-with-link-relative-external',
         'original-html-with-links-css',
         'original-html-with-mixed-type-links',
         'original-html-with-non-stylesheet-link',
@@ -234,6 +238,50 @@ class CssInlinerPluginTest extends TestCase
 
         $this->assertEquals(
             $this->stubs['converted-html-with-mixed-type-links'],
+            $this->normalize($message->getBody())
+        );
+    }
+
+    /** @test **/
+    public function itShouldWorkWithExternalLink()
+    {
+        $mailer = new Swift_Mailer(new Swift_NullTransport());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = new Swift_Message('Test');
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+
+        $message->setBody($this->stubs['original-html-with-link-external'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals(
+            $this->stubs['converted-html-with-link-external'],
+            $this->normalize($message->getBody())
+        );
+    }
+
+    /** @test **/
+    public function itShouldWorkWithRelativeExternalLink()
+    {
+        $mailer = new Swift_Mailer(new Swift_NullTransport());
+
+        $mailer->registerPlugin(new CssInlinerPlugin($this->options));
+
+        $message = new Swift_Message('Test');
+
+        $message->setFrom('test@example.com');
+        $message->setTo('test2@example.com');
+
+        $message->setBody($this->stubs['original-html-with-link-relative-external'], 'text/html');
+
+        $mailer->send($message);
+
+        $this->assertEquals(
+            $this->stubs['converted-html-with-link-relative-external'],
             $this->normalize($message->getBody())
         );
     }
