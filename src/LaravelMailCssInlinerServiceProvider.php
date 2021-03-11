@@ -15,6 +15,8 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/css-inliner.php' => base_path('config/css-inliner.php'),
         ], 'config');
+
+        $this->app['mail.manager']->getSwiftMailer()->registerPlugin($this->app->make(CssInlinerPlugin::class));
     }
 
     /**
@@ -28,11 +30,6 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
 
         $this->app->singleton(CssInlinerPlugin::class, function ($app) {
             return new CssInlinerPlugin($app['config']->get('css-inliner'));
-        });
-
-        $this->app->afterResolving('mail.manager', function (MailManager $mailManager) {
-            $mailManager->getSwiftMailer()->registerPlugin($this->app->make(CssInlinerPlugin::class));
-            return $mailManager;
         });
     }
 }
