@@ -62,7 +62,7 @@ Into this:
 ```
 
 ## Installation
-This package needs Laravel 7.x.
+This package needs Laravel 7.x or 8.x.
 
 Begin by installing this package through Composer. Require it directly from the Terminal to take the last stable version:
 ```bash
