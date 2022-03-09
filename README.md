@@ -12,9 +12,17 @@ Laravel Mail CSS Inliner
 Most email clients won't render CSS (on a `<link>` or a `<style>`). The solution is inline your CSS directly on the HTML. Doing this by hand easily turns into unmantainable templates.
 The goal of this package is to automate the process of inlining that CSS before sending the emails.
 
+## Instalation and compatability
+
+Starting with version 5 this package requires PHP 8.0 and Laravel 9.0 or higher.
+
+## Using an older version of PHP / Laravel?
+
+If you are on a PHP version below 8.0 or a Laravel version below 9.0 just use version 4.* of this package.
+
 ## How?
-Using a wonderful [CSS inliner package](https://github.com/tijsverkoyen/CssToInlineStyles) wrapped in a SwiftMailer plugin and served as a Service Provider it just works without any configuration.
-Since this is a SwiftMailer plugin, it will automatically inline your css when parsing an email template. You don't have to do anything!
+Using a wonderful [CSS inliner package](https://github.com/tijsverkoyen/CssToInlineStyles) wrapped in a Symfony Mailer plugin and served as a Service Provider it just works without any configuration.
+Since this is a Symfony Mailer plugin, it will automatically inline your css when parsing an email template. You don't have to do anything!
 
 Turns style tag:
 ```html
@@ -62,7 +70,7 @@ Into this:
 ```
 
 ## Installation
-This package needs Laravel 7.x.
+This package needs Laravel 9.x.
 
 Begin by installing this package through Composer. Require it directly from the Terminal to take the last stable version:
 ```bash
