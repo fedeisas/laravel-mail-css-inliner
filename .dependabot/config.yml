@@ -1,5 +1,0 @@
-version: 1
-update_configs:
-  - package_manager: "php:composer"
-    directory: "/"
-    update_schedule: "daily"
