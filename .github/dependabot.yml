@@ -1,10 +1,4 @@
 version: 2
-registries:
-  composer-repository-nova-laravel-com:
-    type: composer-repository
-    url: https://nova.laravel.com
-    username: federicoisas@gmail.com
-    password: "${{secrets.COMPOSER_REPOSITORY_NOVA_LARAVEL_COM_PASSWORD}}"
 
 updates:
 - package-ecosystem: composer
@@ -13,9 +7,3 @@ updates:
     interval: daily
     time: "09:00"
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: phpunit/phpunit
-    versions:
-    - 8.5.14
-  registries:
-  - composer-repository-nova-laravel-com
