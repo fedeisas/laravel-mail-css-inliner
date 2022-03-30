@@ -1,6 +1,7 @@
 <?php namespace Fedeisas\LaravelMailCssInliner;
 
-use Illuminate\Mail\MailManager;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelMailCssInlinerServiceProvider extends ServiceProvider
@@ -10,7 +11,7 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__ . '/../config/css-inliner.php' => base_path('config/css-inliner.php'),
@@ -22,17 +23,14 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/css-inliner.php', 'css-inliner');
+        $this->mergeConfigFrom(__DIR__ . '/../config/css-inliner.php', 'css-files');
 
         $this->app->singleton(CssInlinerPlugin::class, function ($app) {
-            return new CssInlinerPlugin($app['config']->get('css-inliner'));
+            return new CssInlinerPlugin($app['config']->get('css-inliner.css-files', []));
         });
 
-        $this->app->afterResolving('mail.manager', function (MailManager $mailManager) {
-            $mailManager->getSwiftMailer()->registerPlugin($this->app->make(CssInlinerPlugin::class));
-            return $mailManager;
-        });
+        Event::listen(MessageSending::class, CssInlinerPlugin::class);
     }
 }

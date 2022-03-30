@@ -2,139 +2,133 @@
 
 namespace Fedeisas\LaravelMailCssInliner;
 
+use DOMDocument;
+use Illuminate\Mail\Events\MessageSending;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\TextPart;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
-class CssInlinerPlugin implements \Swift_Events_SendListener
+class CssInlinerPlugin
 {
-    /**
-     * @var CssToInlineStyles
-     */
-    protected $converter;
+    private CssToInlineStyles $converter;
 
-    /**
-     * @var string[]
-     */
-    protected $cssCache;
+    private string $cssToAlwaysInclude;
 
-    /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * @param array $options options defined in the configuration file.
-     */
-    public function __construct(array $options)
+    public function __construct(array $filesToInline = [], CssToInlineStyles $converter = null)
     {
-        $this->converter = new CssToInlineStyles();
-        $this->options = $options;
+        $this->cssToAlwaysInclude = $this->loadCssFromFiles($filesToInline);
+
+        $this->converter = $converter ?? new CssToInlineStyles;
     }
 
-    /**
-     * @param \Swift_Events_SendEvent $evt
-     */
-    public function beforeSendPerformed(\Swift_Events_SendEvent $evt)
+    public function handle(MessageSending $event): void
     {
-        $message = $evt->getMessage();
+        $message = $event->message;
 
-        if ($message->getContentType() === 'text/html'
-            || ($message->getContentType() === 'multipart/alternative' && $message->getBody())
-            || ($message->getContentType() === 'multipart/mixed' && $message->getBody())
-        ) {
-            [$body, $cssResources] = $this->messageSieve($message->getBody());
-            $css = $this->concatCss($cssResources);
-            $message->setBody($this->converter->convert($body, $css));
+        if (!$message instanceof Message) {
+            return;
         }
 
-        foreach ($message->getChildren() as $part) {
-            if (strpos($part->getContentType(), 'text/html') === 0) {
-                [$body, $cssResources] = $this->messageSieve($part->getBody());
-                $css = $this->concatCss($cssResources);
-                $part->setBody($this->converter->convert($body, $css));
-            }
+        $this->handleSymfonyMessage($message);
+    }
+
+    public function handleSymfonyEvent(MessageEvent $event): void
+    {
+        $message = $event->getMessage();
+
+        if (!$message instanceof Message) {
+            return;
+        }
+
+        $this->handleSymfonyMessage($message);
+    }
+
+    private function processPart(AbstractPart $part): AbstractPart
+    {
+        if ($part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === 'html') {
+            return $this->processHtmlTextPart($part);
+        }
+
+        return $part;
+    }
+
+    private function loadCssFromFiles(array $cssFiles): string
+    {
+        $css = '';
+
+        foreach ($cssFiles as $file) {
+            $css .= file_get_contents($file);
+        }
+
+        return $css;
+    }
+
+    private function processHtmlTextPart(TextPart $part): TextPart
+    {
+        [$cssFiles, $bodyString] = $this->extractCssFilesFromMailBody($part->getBody());
+
+        $bodyString = $this->converter->convert($bodyString, $this->cssToAlwaysInclude . "\n" . $this->loadCssFromFiles($cssFiles));
+
+        return new TextPart($bodyString, $part->getPreparedHeaders()->getHeaderParameter('Content-Type', 'charset') ?: 'utf-8', 'html');
+    }
+
+    private function handleSymfonyMessage(Message $message): void
+    {
+        $body = $message->getBody();
+
+        if ($body === null) {
+            return;
+        }
+
+        if ($body instanceof TextPart) {
+            $message->setBody($this->processPart($body));
+        } elseif ($body instanceof AlternativePart) {
+            $message->setBody(new AlternativePart(
+                ...array_map(
+                    fn (AbstractPart $part) => $this->processPart($part),
+                    $body->getParts()
+                )
+            ));
         }
     }
 
-    /**
-     * Do nothing
-     *
-     * @param \Swift_Events_SendEvent $evt
-     */
-    public function sendPerformed(\Swift_Events_SendEvent $evt)
+    private function extractCssFilesFromMailBody(string $message): array
     {
-        // Do Nothing
-    }
+        $document = new DOMDocument;
 
-    protected function concatCss(array $cssResources): string
-    {
-        $output = '';
-        foreach ($cssResources as $cssResource) {
-            $output.= $this->fetchCss($cssResource);
-        }
+        $previousUseInternalErrors = libxml_use_internal_errors(true);
 
-        return $output;
-    }
+        $document->loadHTML($message);
 
-    protected function fetchCss(string $filename): string
-    {
-        if (isset($this->cssCache[$filename])) {
-            return $this->cssCache[$filename];
-        }
+        libxml_use_internal_errors($previousUseInternalErrors);
 
-        $fixedFilename = $filename;
-        // Fix relative protocols on hrefs. Assume https.
-        if (substr($filename, 0, 2) === '//') {
-            $fixedFilename = 'https:' . $filename;
-        }
+        $cssLinkTags = [];
 
-        $content = file_get_contents($fixedFilename);
-        if (! $content) {
-            return '';
-        }
-
-        $this->cssCache[$filename] = $content;
-
-        return $content;
-    }
-
-    protected function messageSieve(string $message): array
-    {
-        $cssResources = [];
-
-        // Initialize with config defaults, if any
-        if (isset($this->options['css-files'])) {
-            $cssResources = $this->options['css-files'];
-        }
-
-        $dom = new \DOMDocument();
-        // set error level
-        $internalErrors = libxml_use_internal_errors(true);
-
-        $dom->loadHTML($message);
-
-        // Restore error level
-        libxml_use_internal_errors($internalErrors);
-        $link_tags = $dom->getElementsByTagName('link');
-
-        /** @var \DOMElement $link */
-        foreach ($link_tags as $link) {
-            if ($link->getAttribute('rel') === 'stylesheet') {
-                array_push($cssResources, $link->getAttribute('href'));
+        foreach ($document->getElementsByTagName('link') as $linkTag) {
+            if ($linkTag->getAttribute('rel') === 'stylesheet') {
+                $cssLinkTags[] = $linkTag;
             }
         }
 
-        $link_tags = $dom->getElementsByTagName('link');
-        for ($i = $link_tags->length; --$i >= 0;) {
-            $link = $link_tags->item($i);
-            if ($link->getAttribute('rel') === 'stylesheet') {
-                $link->parentNode->removeChild($link);
-            }
+        $cssFiles = [];
+
+        foreach ($cssLinkTags as $linkTag) {
+            $cssFiles[] = $linkTag->getAttribute('href');
+
+            $linkTag->parentNode->removeChild($linkTag);
         }
 
-        if (count($cssResources)) {
-            return [$dom->saveHTML(), $cssResources];
+        // If we found CSS files in the document we load them and return the document without the link tags
+        if (!empty($cssFiles)) {
+            /** @noinspection PhpExpressionResultUnusedInspection */
+            $this->loadCssFromFiles($cssFiles);
+
+            return [$cssFiles, $document->saveHTML()];
         }
 
-        return [$message, []];
+        return [$cssFiles, $message];
     }
 }
