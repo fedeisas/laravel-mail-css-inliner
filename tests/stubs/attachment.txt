@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+    <head>
+        <style>
+            .block {
+                width: 100px;
+                height: 20px;
+            }
+            div.block ul li.small {
+                margin: 10px;
+            }
+            .picture-feed {
+                width: 50%;
+            }
+            @media (max-width: 768px) {
+                .picture-feed {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div><img class="picture-feed" src="foo.jpg"></div>
+        <div class="block">
+            text
+
+            <ul>
+                <li>
+                    Big list
+                </li>
+                <li class="small">
+                    Small list
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

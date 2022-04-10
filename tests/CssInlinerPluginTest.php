@@ -12,7 +12,9 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
 
 class CssInlinerPluginTest extends TestCase
@@ -59,9 +61,28 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html');
     }
 
+    public function test_it_should_convert_html_body_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html'])
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+    }
+
     public function test_it_should_convert_html_body_with_given_css(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html-with-css']),
+            [__DIR__ . '/css/test.css']
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+    }
+
+    public function test_it_should_convert_html_body_with_given_css_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
             (new Email)->html($this->stubs['original-html-with-css']),
             [__DIR__ . '/css/test.css']
         );
@@ -81,6 +102,18 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
     }
 
+    public function test_it_should_convert_html_body_and_text_parts_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
+            (new Email)
+                ->html($this->stubs['original-html'])
+                ->text($this->stubs['plain-text'])
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+        $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
+    }
+
     public function test_it_should_leave_plain_text_unmodified(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
@@ -90,9 +123,27 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'plain-text');
     }
 
+    public function test_it_should_leave_plain_text_unmodified_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
+            (new Email)->text($this->stubs['plain-text']),
+        );
+
+        $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
+    }
+
     public function test_it_should_convert_html_body_as_a_part(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html'])
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+    }
+
+    public function test_it_should_convert_html_body_as_a_part_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
             (new Email)->html($this->stubs['original-html'])
         );
 
@@ -108,9 +159,27 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html-with-css');
     }
 
+    public function test_it_should_convert_html_body_with_link_css_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html-with-link-css'])
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+    }
+
     public function test_it_should_convert_html_body_with_links_css(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html-with-links-css'])
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-links-css');
+    }
+
+    public function test_it_should_convert_html_body_with_links_css_with_attachment(): void
+    {
+        $message = $this->fakeSendMessageWithAttachmentUsingInlinePlugin(
             (new Email)->html($this->stubs['original-html-with-links-css'])
         );
 
@@ -125,7 +194,7 @@ class CssInlinerPluginTest extends TestCase
 
         if ($body instanceof TextPart) {
             $actual = $body->getBody();
-        } elseif ($body instanceof AlternativePart) {
+        } elseif ($body instanceof AlternativePart || $body instanceof MixedPart) {
             $actual = (new Collection($body->getParts()))->first(
                 static fn ($part) => $part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === $mediaSubType
             )->getBody();
@@ -167,6 +236,41 @@ class CssInlinerPluginTest extends TestCase
                 $message->to('test2@example.com')
                         ->from('test@example.com')
                         ->subject('Test')
+            );
+        } catch (TransportExceptionInterface) {
+            // We are not really expecting anything to happen here considering it's a `NullTransport` we are using :)
+        }
+
+        if (!$processedMessage instanceof Email) {
+            throw new RuntimeException('No email was processed!');
+        }
+
+        return $processedMessage;
+    }
+
+    private function fakeSendMessageWithAttachmentUsingInlinePlugin(Email $message, array $inlineCssFiles = []): Email
+    {
+        $processedMessage = null;
+
+        $dispatcher = new EventDispatcher;
+        $dispatcher->addListener(MessageEvent::class, static function (MessageEvent $event) use ($inlineCssFiles, &$processedMessage) {
+            $handler = new CssInlinerPlugin($inlineCssFiles);
+
+            $handler->handleSymfonyEvent($event);
+
+            $processedMessage = $event->getMessage();
+        });
+
+        $mailer = new Mailer(
+            Transport::fromDsn('null://default', $dispatcher)
+        );
+
+        try {
+            $mailer->send(
+                $message->to('test2@example.com')
+                        ->from('test@example.com')
+                        ->subject('Test')
+                        ->attachFromPath(__DIR__ . "/stubs/attachment.txt")
             );
         } catch (TransportExceptionInterface) {
             // We are not really expecting anything to happen here considering it's a `NullTransport` we are using :)
