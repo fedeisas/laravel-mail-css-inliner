@@ -34,24 +34,27 @@ jobs:
         id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      - name: Cache composer dependencies
-        uses: actions/cache@v1
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install Composer dependencies
-        run: composer install --no-ansi --no-interaction --no-progress --optimize-autoloader
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --optimize-autoloader
 
       - name: Setup Problem Matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+        continue-on-error: ${{ matrix.allow_fail }}
 
       - name: Test with phpunit
         run: vendor/bin/phpunit --coverage-text
+        continue-on-error: ${{ matrix.allow_fail }}
 
-      - name: Sensiolabs Security checker
+      - name: Check for vulnerabilities
         run: composer security-checker
+        continue-on-error: ${{ matrix.allow_fail }}
 
   composer-normalize:
     runs-on: ubuntu-latest
