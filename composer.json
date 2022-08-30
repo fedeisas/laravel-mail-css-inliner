@@ -21,6 +21,7 @@
         "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "require-dev": {
+        "enlightn/security-checker": "^1.10",
         "phpunit/phpunit": "^9.0",
         "symfony/mailer": "^6.0"
     },
@@ -43,5 +44,11 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "security-checker": "security-checker security:check"
+    },
+    "scripts-descriptions": {
+        "security-checker": "Checks if your application uses dependencies with known security vulnerabilities."
     }
 }

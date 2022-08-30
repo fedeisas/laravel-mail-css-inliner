@@ -1,41 +1,61 @@
 name: CI
-on: [push, pull_request]
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
+
 jobs:
   test:
-    runs-on: [ubuntu-latest, windows-latest]
+    name: PHP ${{ matrix.name }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['8.1', '8.0']
+        include:
+          - php: 8.0
+            allow_fail: false
+            name: 'PHP 8.0'
+          - php: 8.1
+            allow_fail: false
+            name: 'PHP 8.1'
     steps:
       - uses: actions/checkout@v1
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v1
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: dom, libxml, mbstring, intl, xml, fileinfo, zip
           coverage: xdebug
-          tools: prestissimo
+
       - name: Get composer cache directory
         id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache composer dependencies
-        uses: actions/cache@v1
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Install Composer dependencies
-        run: composer install --no-ansi --no-interaction --no-progress --optimize-autoloader
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --optimize-autoloader
+
       - name: Setup Problem Matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+        continue-on-error: ${{ matrix.allow_fail }}
+
       - name: Test with phpunit
         run: vendor/bin/phpunit --coverage-text
-      - name: Sensiolabs Security checker
-        working-directory: ${{env.working-directory}}
-        run: |
-          wget https://get.sensiolabs.org/security-checker.phar
-          php security-checker.phar security:check
+        continue-on-error: ${{ matrix.allow_fail }}
+
+      - name: Check for vulnerabilities
+        run: composer security-checker
+        continue-on-error: ${{ matrix.allow_fail }}
+
   composer-normalize:
     runs-on: ubuntu-latest
     steps:
