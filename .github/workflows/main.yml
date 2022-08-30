@@ -51,10 +51,7 @@ jobs:
         run: vendor/bin/phpunit --coverage-text
 
       - name: Sensiolabs Security checker
-        working-directory: ${{env.working-directory}}
-        run: |
-          wget https://get.sensiolabs.org/security-checker.phar
-          php security-checker.phar security:check
+        run: composer security-checker
 
   composer-normalize:
     runs-on: ubuntu-latest
