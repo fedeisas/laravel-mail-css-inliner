@@ -7,6 +7,7 @@ use Illuminate\Mail\Events\MessageSending;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
@@ -51,6 +52,15 @@ class CssInlinerPlugin
     {
         if ($part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === 'html') {
             return $this->processHtmlTextPart($part);
+        } else if ($part instanceof AbstractMultipartPart) {
+            $part_class = get_class($part);
+            $parts = [];
+
+            foreach ($part->getParts() as $childPart) {
+                $parts[] = $this->processPart($childPart);
+            }
+
+            return new $part_class(...$parts);
         }
 
         return $part;
