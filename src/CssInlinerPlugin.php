@@ -8,6 +8,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -85,8 +86,9 @@ class CssInlinerPlugin
 
         if ($body instanceof TextPart) {
             $message->setBody($this->processPart($body));
-        } elseif ($body instanceof AlternativePart) {
-            $message->setBody(new AlternativePart(
+        } elseif ($body instanceof AlternativePart || $body instanceof MixedPart) {
+            $part_type = get_class($body);
+            $message->setBody(new $part_type(
                 ...array_map(
                     fn (AbstractPart $part) => $this->processPart($part),
                     $body->getParts()

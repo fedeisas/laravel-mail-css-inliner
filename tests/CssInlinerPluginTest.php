@@ -125,7 +125,7 @@ class CssInlinerPluginTest extends TestCase
 
         if ($body instanceof TextPart) {
             $actual = $body->getBody();
-        } elseif ($body instanceof AlternativePart) {
+        } elseif ($body instanceof AlternativePart || $body instanceof MixedPart) {
             $actual = (new Collection($body->getParts()))->first(
                 static fn ($part) => $part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === $mediaSubType
             )->getBody();
