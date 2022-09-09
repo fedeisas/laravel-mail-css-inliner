@@ -136,6 +136,48 @@ class CssInlinerPluginTest extends TestCase
         $this->assertEquals($this->stubs[$stub], $this->cleanupHtmlStringForComparison($actual));
     }
 
+    private function assertSameMessageStructure(Email $expected, Email $actual)
+    {
+        $expected_structure = $this->getMessagePartStructure($expected->getBody());
+        $actual_structure = $this->getMessagePartStructure($actual->getBody());
+
+        $this->assertEquals($expected_structure, $actual_structure);
+    }
+
+    private function assertAttachmentsAreIdentical(Email $expected, Email $actual)
+    {
+        $expected_attachments = $expected->getAttachments();
+        $actual_attachments = $actual->getAttachments();
+
+        $this->assertGreaterThan(0, count($expected_attachments));
+        $this->assertSameSize($expected_attachments, $actual_attachments);
+
+        for ($i = 0; $i < count($expected_attachments); $i++) {
+            $this->assertEquals($expected_attachments[$i]->getBody(), $actual_attachments[$i]->getBody());
+        }
+    }
+
+    private function getMessagePartStructure(AbstractPart $part): array|string
+    {
+        $structure = [];
+
+        $partClass = get_class($part);
+
+        if (! $part instanceof AbstractMultipartPart) {
+            $structure[] = $partClass;
+        } else {
+            $structure[$partClass] = [];
+            foreach ($part->getParts() as $childPart) {
+                $structure[$partClass][] = $this->getMessagePartStructure($childPart);
+            }
+        }
+
+        if (count($structure, COUNT_RECURSIVE) === 1) {
+            $structure = $structure[0];
+        }
+
+        return $structure;
+    }
     private function cleanupHtmlStringForComparison(string $string): string
     {
         // Strip out all newlines and trim newlines from the start and end
