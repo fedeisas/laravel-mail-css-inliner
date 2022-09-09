@@ -13,11 +13,9 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\LogicException;
-use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\TextPart;
-use Symfony\Component\Mime\Part\Multipart\MixedPart;
 
 class CssInlinerPluginTest extends TestCase
 {
@@ -63,25 +61,11 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html');
     }
 
-    public function test_it_should_convert_html_body_with_text_attachment(): void
+    public function test_it_should_convert_html_body_with_attachment(): void
     {
         $originalMessage = $this->createMessageToSend(
             (new Email)->html($this->stubs['original-html']),
-            __DIR__ . '/stubs/plain-text.stub'
-        );
-
-        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
-
-        $this->assertBodyMatchesStub($message, 'converted-html');
-        $this->assertSameMessageStructure($originalMessage, $message);
-        $this->assertAttachmentsAreIdentical($originalMessage, $message);
-    }
-
-    public function test_it_should_convert_html_body_with_html_attachment(): void
-    {
-        $originalMessage = $this->createMessageToSend(
-            (new Email)->html($this->stubs['original-html']),
-            __DIR__ . '/stubs/original-html-with-css.stub'
+            __DIR__ . '/stubs/original-html.stub'
         );
 
         $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
@@ -101,28 +85,11 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html-with-css');
     }
 
-    public function test_it_should_convert_html_body_with_given_css_and_text_attachment(): void
+    public function test_it_should_convert_html_body_with_given_css_and_attachment(): void
     {
         $originalMessage = $this->createMessageToSend(
             (new Email)->html($this->stubs['original-html-with-css']),
-            __DIR__ . '/stubs/plain-text.stub'
-        );
-
-        $message = $this->fakeSendMessageUsingInlinePlugin(
-            $originalMessage,
-            [__DIR__ . '/css/test.css']
-        );
-
-        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
-        $this->assertSameMessageStructure($originalMessage, $message);
-        $this->assertAttachmentsAreIdentical($originalMessage, $message);
-    }
-
-    public function test_it_should_convert_html_body_with_given_css_and_html_attachment(): void
-    {
-        $originalMessage = $this->createMessageToSend(
-            (new Email)->html($this->stubs['original-html-with-css']),
-            __DIR__ . '/stubs/original-html-with-css.stub'
+            __DIR__ . '/stubs/original-html.stub'
         );
 
         $message = $this->fakeSendMessageUsingInlinePlugin(
@@ -147,13 +114,42 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
     }
 
+    public function test_it_should_convert_html_body_and_text_parts_with_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html'])->text($this->stubs['plain-text']),
+            __DIR__ . '/stubs/original-html.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+        $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
+    }
+
     public function test_it_should_leave_plain_text_unmodified(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
             (new Email)->text($this->stubs['plain-text'])
         );
 
-        $this->assertBodyMatchesStub($message, 'plain-text');
+        $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
+    }
+
+    public function test_it_should_leave_plain_text_unmodified_with_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->text($this->stubs['plain-text']),
+            __DIR__ . '/stubs/original-html.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
+
+        $this->assertBodyMatchesStub($message, 'plain-text', 'plain');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
     }
 
     public function test_it_should_convert_html_body_as_a_part(): void
@@ -165,6 +161,19 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html');
     }
 
+    public function test_it_should_convert_html_body_as_a_part_with_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html']),
+            __DIR__ . '/stubs/original-html.stub'
+        );
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
+    }
+
     public function test_it_should_convert_html_body_with_link_css(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
@@ -172,6 +181,20 @@ class CssInlinerPluginTest extends TestCase
         );
 
         $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+    }
+
+    public function test_it_should_convert_html_body_with_link_css_and_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html-with-link-css']),
+            __DIR__ . '/stubs/original-html.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
     }
 
     public function test_it_should_convert_html_body_with_links_css(): void
@@ -183,20 +206,31 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html-with-links-css');
     }
 
-    private function assertBodyMatchesStub(object $message, string $stub, string $mediaSubType = 'html'): void
+    public function test_it_should_convert_html_body_with_links_css_and_attachment(): void
     {
-        $this->assertInstanceOf(Email::class, $message);
+        $originalMessage = $this->createMEssageToSend(
+            (new Email)->html($this->stubs['original-html-with-links-css']),
+            __DIR__ . '/stubs/original-html.stub'
+        );
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
 
+        $this->assertBodyMatchesStub($message, 'converted-html-with-links-css');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
+    }
+
+    private function assertBodyMatchesStub(Email $message, string $stub, string $mediaSubType = 'html'): void
+    {
         $body = $message->getBody();
 
-        if ($body instanceof TextPart) {
-            $actual = $body->getBody();
-        } elseif ($body instanceof AlternativePart || $body instanceof MixedPart) {
-            $actual = (new Collection($body->getParts()))->first(
-                static fn ($part) => $part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === $mediaSubType
-            )->getBody();
-        } else {
+        if (! $body instanceof AbstractPart) {
             throw new RuntimeException('Unknown message body type');
+        }
+
+        $actual = $this->getTextFromPart($body, $mediaSubType);
+
+        if (is_null($actual)) {
+            throw new RuntimeException("No text found in body with media subtype '$mediaSubType'" );
         }
 
         $this->assertEquals($this->stubs[$stub], $this->cleanupHtmlStringForComparison($actual));
@@ -252,6 +286,23 @@ class CssInlinerPluginTest extends TestCase
 
         // Strip out any whitespace between HTML tags
         return preg_replace('/(>)\s+(<\/?[a-z]+)/', '$1$2', $string);
+    }
+
+    private function getTextFromPart(AbstractPart $part, string $mediaSubType = 'html'): ?string
+    {
+        if ($part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === $mediaSubType) {
+            return $part->getBody();
+        } elseif ($part instanceof AbstractMultipartPart) {
+            foreach ($part->getParts() as $childPart) {
+                $text = $this->getTextFromPart($childPart, $mediaSubType);
+
+                if (! is_null($text)) {
+                    return $text;
+                }
+            }
+        }
+
+        return null;
     }
 
     private function fakeSendMessageUsingInlinePlugin(Email $message, array $inlineCssFiles = []): Email
