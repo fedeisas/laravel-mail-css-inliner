@@ -4,7 +4,7 @@ namespace Fedeisas\LaravelMailCssInliner;
 
 use DOMDocument;
 use Illuminate\Mail\Events\MessageSending;
-use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
@@ -29,22 +29,22 @@ class CssInlinerPlugin
     {
         $message = $event->message;
 
-        if (!$message instanceof Message) {
+        if (!$message instanceof Email) {
             return;
         }
 
-        $this->handleSymfonyMessage($message);
+        $this->handleSymfonyEmail($message);
     }
 
     public function handleSymfonyEvent(MessageEvent $event): void
     {
         $message = $event->getMessage();
 
-        if (!$message instanceof Message) {
+        if (!$message instanceof Email) {
             return;
         }
 
-        $this->handleSymfonyMessage($message);
+        $this->handleSymfonyEmail($message);
     }
 
     private function processPart(AbstractPart $part): AbstractPart
@@ -76,7 +76,7 @@ class CssInlinerPlugin
         return new TextPart($bodyString, $part->getPreparedHeaders()->getHeaderParameter('Content-Type', 'charset') ?: 'utf-8', 'html');
     }
 
-    private function handleSymfonyMessage(Message $message): void
+    private function handleSymfonyEmail(Email $message): void
     {
         $body = $message->getBody();
 
