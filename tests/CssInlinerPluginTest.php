@@ -12,8 +12,12 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
+use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
 
 class CssInlinerPluginTest extends TestCase
 {
@@ -59,6 +63,34 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html');
     }
 
+    public function test_it_should_convert_html_body_with_text_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html']),
+            __DIR__ . '/stubs/plain-text.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
+    }
+
+    public function test_it_should_convert_html_body_with_html_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html']),
+            __DIR__ . '/stubs/original-html-with-css.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin($originalMessage);
+
+        $this->assertBodyMatchesStub($message, 'converted-html');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
+    }
+
     public function test_it_should_convert_html_body_with_given_css(): void
     {
         $message = $this->fakeSendMessageUsingInlinePlugin(
@@ -67,6 +99,40 @@ class CssInlinerPluginTest extends TestCase
         );
 
         $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+    }
+
+    public function test_it_should_convert_html_body_with_given_css_and_text_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html-with-css']),
+            __DIR__ . '/stubs/plain-text.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin(
+            $originalMessage,
+            [__DIR__ . '/css/test.css']
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
+    }
+
+    public function test_it_should_convert_html_body_with_given_css_and_html_attachment(): void
+    {
+        $originalMessage = $this->createMessageToSend(
+            (new Email)->html($this->stubs['original-html-with-css']),
+            __DIR__ . '/stubs/original-html-with-css.stub'
+        );
+
+        $message = $this->fakeSendMessageUsingInlinePlugin(
+            $originalMessage,
+            [__DIR__ . '/css/test.css']
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+        $this->assertSameMessageStructure($originalMessage, $message);
+        $this->assertAttachmentsAreIdentical($originalMessage, $message);
     }
 
     public function test_it_should_convert_html_body_and_text_parts(): void
@@ -178,6 +244,7 @@ class CssInlinerPluginTest extends TestCase
 
         return $structure;
     }
+
     private function cleanupHtmlStringForComparison(string $string): string
     {
         // Strip out all newlines and trim newlines from the start and end
