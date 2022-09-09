@@ -162,12 +162,15 @@ class CssInlinerPluginTest extends TestCase
             Transport::fromDsn('null://default', $dispatcher)
         );
 
+        // Check if the message is valid (has to, cc and bcc set). If not, we create a valid message.
         try {
-            $mailer->send(
-                $message->to('test2@example.com')
-                        ->from('test@example.com')
-                        ->subject('Test')
-            );
+            $message->ensureValidity();
+        } catch (LogicException) {
+            $message = $this->createMessageToSend($message);
+        }
+
+        try {
+            $mailer->send($message);
         } catch (TransportExceptionInterface) {
             // We are not really expecting anything to happen here considering it's a `NullTransport` we are using :)
         }
@@ -177,5 +180,18 @@ class CssInlinerPluginTest extends TestCase
         }
 
         return $processedMessage;
+    }
+
+    private function createMessageToSend(Email $message, string $attachmentPath = null): Email
+    {
+        $message = $message->to('test2@example.com')
+                    ->from('test@example.com')
+                    ->subject('Test');
+
+        if (! is_null($attachmentPath)) {
+            $message = $message->attachFromPath($attachmentPath);
+        }
+
+        return $message;
     }
 }
