@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "enlightn/security-checker": "^1.10",
+        "guzzlehttp/guzzle": "^6.5.8 || ^7.4.5",
         "phpunit/phpunit": "^9.0",
         "symfony/mailer": "^6.0"
     },
