@@ -16,9 +16,12 @@ class CssInlinerPlugin
     private CssToInlineStyles $converter;
 
     private string $cssToAlwaysInclude;
+    private bool   $secure;
 
-    public function __construct(array $filesToInline = [], CssToInlineStyles $converter = null)
+    public function __construct(array $filesToInline = [], bool $secure = true, CssToInlineStyles $converter = null)
     {
+        $this->secure = $secure;
+
         $this->cssToAlwaysInclude = $this->loadCssFromFiles($filesToInline);
 
         $this->converter = $converter ?? new CssToInlineStyles;
@@ -60,7 +63,19 @@ class CssInlinerPlugin
         $css = '';
 
         foreach ($cssFiles as $file) {
-            $css .= file_get_contents($file);
+            $css .= file_get_contents(
+                $file,
+                false,
+                stream_context_create(
+                    [
+                        'ssl' =>
+                            [
+                                'verify_peer'      => $this->secure,
+                                'verify_peer_name' => $this->secure,
+                            ],
+                    ]
+                )
+            );
         }
 
         return $css;

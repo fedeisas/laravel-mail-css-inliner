@@ -15,4 +15,15 @@ return [
 
     'css-files' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Secure
+    |--------------------------------------------------------------------------
+    |
+    | By setting this option to true, you let the package only allow to
+    | retrieve contents from the url if it is HTTPS and if it has a valid
+    | SSL certificate. Setting this option to false will disable this check.
+    |
+    */
+    'secure' => false
 ];
