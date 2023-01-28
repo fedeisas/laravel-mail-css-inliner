@@ -18,10 +18,12 @@
         "ext-dom": "*",
         "illuminate/mail": "^9.0",
         "illuminate/support": "^9.0",
+        "paragonie/random_compat": "~2.0 || ~9.99",
         "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "require-dev": {
         "enlightn/security-checker": "^1.10",
+        "guzzlehttp/guzzle": "^6.5.8 || ^7.4.5",
         "phpunit/phpunit": "^9.0",
         "symfony/mailer": "^6.0"
     },

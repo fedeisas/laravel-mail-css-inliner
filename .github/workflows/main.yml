@@ -16,10 +16,18 @@ jobs:
         include:
           - php: 8.0
             allow_fail: false
-            name: 'PHP 8.0'
+            name: 'PHP 8.0 with latest deps'
+          - php: 8.0
+            allow_fail: false
+            name: 'PHP 8.0 with lowest stable deps'
+            composer_update_flags: '--prefer-lowest --prefer-stable'
           - php: 8.1
             allow_fail: false
-            name: 'PHP 8.1'
+            name: 'PHP 8.1 with latest deps'
+          - php: 8.1
+            allow_fail: false
+            name: 'PHP 8.1 with lowest stable deps'
+            composer_update_flags: '--prefer-lowest --prefer-stable'
     steps:
       - uses: actions/checkout@v1
 
@@ -38,11 +46,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --optimize-autoloader
+
+      - name: Update dependencies
+        if: matrix.composer_update_flags
+        run: composer update ${{ matrix.composer_update_flags }}
 
       - name: Setup Problem Matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
