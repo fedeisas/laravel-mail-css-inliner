@@ -28,6 +28,13 @@ jobs:
             allow_fail: false
             name: 'PHP 8.1 with lowest stable deps'
             composer_update_flags: '--prefer-lowest --prefer-stable'
+          - php: 8.2
+            allow_fail: false
+            name: 'PHP 8.2 with latest deps'
+          - php: 8.2
+            allow_fail: false
+            name: 'PHP 8.2 with lowest stable deps'
+            composer_update_flags: '--prefer-lowest --prefer-stable'
     steps:
       - uses: actions/checkout@v1
 
