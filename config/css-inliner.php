@@ -25,5 +25,5 @@ return [
     | SSL certificate. Setting this option to false will disable this check.
     |
     */
-    'secure' => false
+    'secure' => true
 ];
