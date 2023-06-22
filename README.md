@@ -84,8 +84,13 @@ php artisan vendor:publish --provider='Fedeisas\LaravelMailCssInliner\LaravelMai
 and changing the settings on the generated `config/css-inliner.php` file.
 
 ## Contributing
+- Install project dependencies:
 ```bash
 composer install
+```
+
+- Execute tests with the following command:
+```bash
 ./vendor/bin/phpunit
 ```
 
