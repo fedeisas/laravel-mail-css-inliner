@@ -74,19 +74,24 @@ This package needs Laravel 9.x.
 
 Begin by installing this package through Composer. Require it directly from the Terminal to take the last stable version:
 ```bash
-$ composer require fedeisas/laravel-mail-css-inliner
+composer require fedeisas/laravel-mail-css-inliner
 ```
 
 At this point the inliner should be already working with the default options. If you want to fine-tune these options, you can do so by publishing the configuration file:
 ```bash
-$ php artisan vendor:publish --provider='Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider'
+php artisan vendor:publish --provider='Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider'
 ```
 and changing the settings on the generated `config/css-inliner.php` file.
 
 ## Contributing
+- Install project dependencies:
 ```bash
-$ composer install
-$ ./vendor/bin/phpunit
+composer install
+```
+
+- Execute tests with the following command:
+```bash
+./vendor/bin/phpunit
 ```
 
 ## Found a bug?
