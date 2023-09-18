@@ -96,7 +96,7 @@ class CssInlinerPlugin
 
         if ($body instanceof TextPart) {
             $message->setBody($this->processPart($body));
-        } elseif ($body instanceof AlternativePart || $body instanceof MixedPart) {
+        } elseif ($body instanceof AbstractMultipartPart) {
             $part_type = get_class($body);
             $message->setBody(new $part_type(
                 ...array_map(
