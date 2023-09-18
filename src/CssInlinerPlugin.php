@@ -79,11 +79,7 @@ class CssInlinerPlugin
 
     private function processHtmlTextPart(TextPart $part): TextPart
     {
-        [$cssFiles, $bodyString] = $this->extractCssFilesFromMailBody($part->getBody());
-
-        $bodyString = $this->converter->convert($bodyString, $this->cssToAlwaysInclude . "\n" . $this->loadCssFromFiles($cssFiles));
-
-        return new TextPart($bodyString, $part->getPreparedHeaders()->getHeaderParameter('Content-Type', 'charset') ?: 'utf-8', 'html');
+        return new TextPart($this->convertString($part->getBody()), $part->getPreparedHeaders()->getHeaderParameter('Content-Type', 'charset') ?: 'utf-8', 'html');
     }
 
     private function handleSymfonyEmail(Email $message): void
@@ -104,6 +100,10 @@ class CssInlinerPlugin
                     $body->getParts()
                 )
             ));
+        }
+
+        if (!empty($message->getHtmlBody())) {
+            $message->html($this->convertString((string) $message->getHtmlBody()));
         }
     }
 
@@ -142,5 +142,12 @@ class CssInlinerPlugin
         }
 
         return [$cssFiles, $message];
+    }
+
+    private function convertString(string $body): string
+    {
+        [$cssFiles, $bodyString] = $this->extractCssFilesFromMailBody($body);
+
+        return $this->converter->convert($bodyString, $this->cssToAlwaysInclude . "\n" . $this->loadCssFromFiles($cssFiles));
     }
 }
