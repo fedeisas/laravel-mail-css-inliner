@@ -223,17 +223,23 @@ class CssInlinerPluginTest extends TestCase
     {
         $body = $message->getBody();
 
-        if (! $body instanceof AbstractPart) {
+        if (!$body instanceof AbstractPart) {
             throw new RuntimeException('Unknown message body type');
         }
 
         $actual = $this->getTextFromPart($body, $mediaSubType);
 
         if (is_null($actual)) {
-            throw new RuntimeException("No text found in body with media subtype '$mediaSubType'" );
+            throw new RuntimeException("No text found in body with media subtype '$mediaSubType'");
         }
 
+
         $this->assertEquals($this->stubs[$stub], $this->cleanupHtmlStringForComparison($actual));
+
+        if ($mediaSubType == 'html') {
+            $htmlBody = $message->getHtmlBody();
+            $this->assertEquals($this->stubs[$stub], $this->cleanupHtmlStringForComparison($htmlBody));
+        }
     }
 
     private function assertSameMessageStructure(Email $expected, Email $actual)
@@ -263,7 +269,7 @@ class CssInlinerPluginTest extends TestCase
 
         $partClass = get_class($part);
 
-        if (! $part instanceof AbstractMultipartPart) {
+        if (!$part instanceof AbstractMultipartPart) {
             $structure[] = $partClass;
         } else {
             $structure[$partClass] = [];
@@ -296,7 +302,7 @@ class CssInlinerPluginTest extends TestCase
             foreach ($part->getParts() as $childPart) {
                 $text = $this->getTextFromPart($childPart, $mediaSubType);
 
-                if (! is_null($text)) {
+                if (!is_null($text)) {
                     return $text;
                 }
             }
@@ -345,10 +351,10 @@ class CssInlinerPluginTest extends TestCase
     private function createMessageToSend(Email $message, string $attachmentPath = null): Email
     {
         $message = $message->to('test2@example.com')
-                    ->from('test@example.com')
-                    ->subject('Test');
+            ->from('test@example.com')
+            ->subject('Test');
 
-        if (! is_null($attachmentPath)) {
+        if (!is_null($attachmentPath)) {
             $message = $message->attachFromPath($attachmentPath);
         }
 
