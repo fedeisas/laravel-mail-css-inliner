@@ -8,8 +8,6 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
-use Symfony\Component\Mime\Part\Multipart\AlternativePart;
-use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -86,23 +84,6 @@ class CssInlinerPlugin
         return new TextPart($bodyString, $part->getPreparedHeaders()->getHeaderParameter('Content-Type', 'charset') ?: 'utf-8', 'html');
     }
 
-    private function getTextFromPart(AbstractPart $part, string $mediaSubType = 'html'): ?string
-    {
-        if ($part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === $mediaSubType) {
-            return $part->getBody();
-        } elseif ($part instanceof AbstractMultipartPart) {
-            foreach ($part->getParts() as $childPart) {
-                $text = $this->getTextFromPart($childPart, $mediaSubType);
-
-                if (! is_null($text)) {
-                    return $text;
-                }
-            }
-        }
-
-        return null;
-    }
-
     private function handleSymfonyEmail(Email $message): void
     {
         $body = $message->getBody();
@@ -123,7 +104,7 @@ class CssInlinerPlugin
             ));
         }
 
-        $message->html($this->getTextFromPart($message->getBody()));
+        $message->html(Util::getTextFromPart($message->getBody()));
     }
 
     private function extractCssFilesFromMailBody(string $message): array

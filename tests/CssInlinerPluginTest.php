@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Fedeisas\LaravelMailCssInliner\CssInlinerPlugin;
+use Fedeisas\LaravelMailCssInliner\Util;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -227,7 +228,7 @@ class CssInlinerPluginTest extends TestCase
             throw new RuntimeException('Unknown message body type');
         }
 
-        $actual = $this->getTextFromPart($body, $mediaSubType);
+        $actual = Util::getTextFromPart($body, $mediaSubType);
 
         if (is_null($actual)) {
             throw new RuntimeException("No text found in body with media subtype '$mediaSubType'");
@@ -292,23 +293,6 @@ class CssInlinerPluginTest extends TestCase
 
         // Strip out any whitespace between HTML tags
         return preg_replace('/(>)\s+(<\/?[a-z]+)/', '$1$2', $string);
-    }
-
-    private function getTextFromPart(AbstractPart $part, string $mediaSubType = 'html'): ?string
-    {
-        if ($part instanceof TextPart && $part->getMediaType() === 'text' && $part->getMediaSubtype() === $mediaSubType) {
-            return $part->getBody();
-        } elseif ($part instanceof AbstractMultipartPart) {
-            foreach ($part->getParts() as $childPart) {
-                $text = $this->getTextFromPart($childPart, $mediaSubType);
-
-                if (!is_null($text)) {
-                    return $text;
-                }
-            }
-        }
-
-        return null;
     }
 
     private function fakeSendMessageUsingInlinePlugin(Email $message, array $inlineCssFiles = []): Email
