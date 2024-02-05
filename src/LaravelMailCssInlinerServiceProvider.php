@@ -28,7 +28,10 @@ class LaravelMailCssInlinerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/css-inliner.php', 'css-files');
 
         $this->app->singleton(CssInlinerPlugin::class, function ($app) {
-            return new CssInlinerPlugin($app['config']->get('css-inliner.css-files', []));
+            return new CssInlinerPlugin(
+                $app['config']->get('css-inliner.css-files', []),
+                $app['config']->get('css-inliner.css-files-to-ignore', [])
+            );
         });
 
         Event::listen(MessageSending::class, CssInlinerPlugin::class);

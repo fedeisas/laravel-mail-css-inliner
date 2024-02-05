@@ -220,6 +220,28 @@ class CssInlinerPluginTest extends TestCase
         $this->assertAttachmentsAreIdentical($originalMessage, $message);
     }
 
+    public function test_it_should_not_inline_files_present_in_the_ignore_list(): void
+    {
+        $message = $this->fakeSendMessageUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html-with-link-external']),
+            [],
+            ['https://github.com/fedeisas/laravel-mail-css-inliner/raw/master/tests/css/test.css']
+        );
+
+        $this->assertBodyMatchesStub($message, 'original-html-with-link-external');
+    }
+
+    public function test_it_should_give_precedence_to_the_css_files_over_the_ignore_list(): void
+    {
+        $message = $this->fakeSendMessageUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html-with-link-external']),
+            [__DIR__ . '/css/test.css'],
+            [__DIR__ . '/css/test.css']
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-link-external');
+    }
+
     private function assertBodyMatchesStub(Email $message, string $stub, string $mediaSubType = 'html'): void
     {
         $body = $message->getBody();
@@ -295,13 +317,13 @@ class CssInlinerPluginTest extends TestCase
         return preg_replace('/(>)\s+(<\/?[a-z]+)/', '$1$2', $string);
     }
 
-    private function fakeSendMessageUsingInlinePlugin(Email $message, array $inlineCssFiles = []): Email
+    private function fakeSendMessageUsingInlinePlugin(Email $message, array $inlineCssFiles = [], array $filesToIgnore = []): Email
     {
         $processedMessage = null;
 
         $dispatcher = new EventDispatcher;
-        $dispatcher->addListener(MessageEvent::class, static function (MessageEvent $event) use ($inlineCssFiles, &$processedMessage) {
-            $handler = new CssInlinerPlugin($inlineCssFiles);
+        $dispatcher->addListener(MessageEvent::class, static function (MessageEvent $event) use ($inlineCssFiles, $filesToIgnore, &$processedMessage) {
+            $handler = new CssInlinerPlugin($inlineCssFiles, $filesToIgnore);
 
             $handler->handleSymfonyEvent($event);
 
