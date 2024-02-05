@@ -15,10 +15,14 @@ class CssInlinerPlugin
 {
     private CssToInlineStyles $converter;
 
+    private array $filesToIgnore;
+
     private string $cssToAlwaysInclude;
 
-    public function __construct(array $filesToInline = [], CssToInlineStyles $converter = null)
+    public function __construct(array $filesToInline = [], $filesToIgnore = [], CssToInlineStyles $converter = null)
     {
+        $this->filesToIgnore = $filesToIgnore;
+
         $this->cssToAlwaysInclude = $this->loadCssFromFiles($filesToInline);
 
         $this->converter = $converter ?? new CssToInlineStyles;
@@ -120,7 +124,7 @@ class CssInlinerPlugin
         $cssLinkTags = [];
 
         foreach ($document->getElementsByTagName('link') as $linkTag) {
-            if ($linkTag->getAttribute('rel') === 'stylesheet') {
+            if ($linkTag->getAttribute('rel') === 'stylesheet' && !in_array($linkTag->getAttribute('href'), $this->filesToIgnore)) {
                 $cssLinkTags[] = $linkTag;
             }
         }
