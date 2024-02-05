@@ -8,8 +8,6 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
-use Symfony\Component\Mime\Part\Multipart\AlternativePart;
-use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -105,6 +103,8 @@ class CssInlinerPlugin
                 )
             ));
         }
+
+        $message->html(Util::getTextFromPart($message->getBody()));
     }
 
     private function extractCssFilesFromMailBody(string $message): array
