@@ -16,17 +16,17 @@
     "require": {
         "php": "^8.0.2",
         "ext-dom": "*",
-        "illuminate/mail": "^9.0 || ^10.0",
-        "illuminate/support": "^9.0 || ^10.0",
+        "illuminate/mail": "^9.0 || ^10.0 || ^11.0",
+        "illuminate/support": "^9.0 || ^10.0 || ^11.0",
         "paragonie/random_compat": "~2.0 || ~9.99",
         "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "require-dev": {
-        "enlightn/security-checker": "^1.10",
+        "enlightn/security-checker": "^1.10 || ^2.0",
         "guzzlehttp/guzzle": "^6.5.8 || ^7.4.5",
         "guzzlehttp/psr7": "^1.9.1 || ^2.4.5",
-        "phpunit/phpunit": "^9.0",
-        "symfony/mailer": "^6.0"
+        "phpunit/phpunit": "^9.0 || ^10.5",
+        "symfony/mailer": "^6.0 || ^7.0"
     },
     "config": {
         "sort-packages": true
