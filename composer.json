@@ -22,7 +22,7 @@
         "tijsverkoyen/css-to-inline-styles": "~2.2"
     },
     "require-dev": {
-        "enlightn/security-checker": "^1.10",
+        "enlightn/security-checker": "^1.10 || ^2.0",
         "guzzlehttp/guzzle": "^6.5.8 || ^7.4.5",
         "guzzlehttp/psr7": "^1.9.1 || ^2.4.5",
         "phpunit/phpunit": "^9.0",
