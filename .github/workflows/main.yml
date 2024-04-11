@@ -36,7 +36,7 @@ jobs:
             name: 'PHP 8.2 with lowest stable deps'
             composer_update_flags: '--prefer-lowest --prefer-stable'
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
@@ -50,7 +50,7 @@ jobs:
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -78,6 +78,6 @@ jobs:
   composer-normalize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Composer normalize
         uses: localheinz/composer-normalize-action@0.5.2
