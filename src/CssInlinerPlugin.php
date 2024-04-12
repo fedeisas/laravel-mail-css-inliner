@@ -3,25 +3,29 @@
 namespace Fedeisas\LaravelMailCssInliner;
 
 use DOMDocument;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Mail\Events\MessageSending;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
-use Symfony\Component\Mime\Part\Multipart\AlternativePart;
-use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class CssInlinerPlugin
 {
+    private array $config;
+
     private CssToInlineStyles $converter;
 
     private string $cssToAlwaysInclude;
 
-    public function __construct(array $filesToInline = [], CssToInlineStyles $converter = null)
+    public function __construct(array $config, CssToInlineStyles $converter = null)
     {
-        $this->cssToAlwaysInclude = $this->loadCssFromFiles($filesToInline);
+
+        $this->config = $config;
+
+        $this->buildCssContent();
 
         $this->converter = $converter ?? new CssToInlineStyles;
     }
@@ -46,6 +50,30 @@ class CssInlinerPlugin
         }
 
         $this->handleSymfonyEmail($message);
+    }
+
+    private function buildCssContent(): void
+    {
+        $this->addCssFromFiles();
+        $this->addCssFromContent();
+    }
+
+    private function addCssFromFiles(): void
+    {
+        $filesToInline = $this->config['css-files'] ?? [];
+
+        $this->cssToAlwaysInclude = $this->loadCssFromFiles($filesToInline);
+    }
+
+    private function addCssFromContent(): void
+    {
+        $contentToInline = $this->config['css-content'] ?? null;
+
+        if (! $contentToInline) {
+            return;
+        }
+
+        $this->cssToAlwaysInclude .= $contentToInline;
     }
 
     private function processPart(AbstractPart $part): AbstractPart

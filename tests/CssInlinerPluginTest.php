@@ -85,6 +85,17 @@ class CssInlinerPluginTest extends TestCase
         $this->assertBodyMatchesStub($message, 'converted-html-with-css');
     }
 
+    public function test_it_should_convert_html_body_with_given_css_content(): void
+    {
+        $message = $this->fakeSendMessageUsingInlinePlugin(
+            (new Email)->html($this->stubs['original-html-with-css']),
+            [],
+            file_get_contents(__DIR__ . '/css/test.css')
+        );
+
+        $this->assertBodyMatchesStub($message, 'converted-html-with-css');
+    }
+
     public function test_it_should_convert_html_body_with_given_css_and_attachment(): void
     {
         $originalMessage = $this->createMessageToSend(
@@ -305,13 +316,16 @@ class CssInlinerPluginTest extends TestCase
         return null;
     }
 
-    private function fakeSendMessageUsingInlinePlugin(Email $message, array $inlineCssFiles = []): Email
+    private function fakeSendMessageUsingInlinePlugin(Email $message, array $inlineCssFiles = [], string $inlineCssContent = null): Email
     {
         $processedMessage = null;
 
         $dispatcher = new EventDispatcher;
-        $dispatcher->addListener(MessageEvent::class, static function (MessageEvent $event) use ($inlineCssFiles, &$processedMessage) {
-            $handler = new CssInlinerPlugin($inlineCssFiles);
+        $dispatcher->addListener(MessageEvent::class, static function (MessageEvent $event) use ($inlineCssFiles, $inlineCssContent, &$processedMessage) {
+            $handler = new CssInlinerPlugin([
+                'css-files' => $inlineCssFiles,
+                'css-content' => $inlineCssContent,
+            ]);
 
             $handler->handleSymfonyEvent($event);
 
