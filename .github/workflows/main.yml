@@ -42,6 +42,13 @@ jobs:
             allow_fail: false
             name: 'PHP 8.3 with lowest stable deps'
             composer_update_flags: '--prefer-lowest --prefer-stable'
+          - php: 8.4
+            allow_fail: false
+            name: 'PHP 8.4 with latest deps'
+          - php: 8.4
+            allow_fail: false
+            name: 'PHP 8.4 with lowest stable deps'
+            composer_update_flags: '--prefer-lowest --prefer-stable'
     steps:
       - uses: actions/checkout@v4
 
@@ -51,17 +58,6 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, libxml, mbstring, intl, xml, fileinfo, zip
           coverage: xdebug
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --optimize-autoloader
@@ -79,6 +75,7 @@ jobs:
         continue-on-error: ${{ matrix.allow_fail }}
 
       - name: Check for vulnerabilities
+        if: ${{ contains(matrix.composer_update_flags, '--prefer-lowest') == false }}
         run: composer security-checker
         continue-on-error: ${{ matrix.allow_fail }}
 

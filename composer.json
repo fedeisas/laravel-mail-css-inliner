@@ -49,7 +49,7 @@
         }
     },
     "scripts": {
-        "security-checker": "security-checker security:check"
+        "security-checker": "security-checker security:check --no-dev"
     },
     "scripts-descriptions": {
         "security-checker": "Checks if your application uses dependencies with known security vulnerabilities."
