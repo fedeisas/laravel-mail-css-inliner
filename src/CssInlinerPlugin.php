@@ -19,7 +19,7 @@ class CssInlinerPlugin
 
     private string $cssToAlwaysInclude;
 
-    public function __construct(array $filesToInline = [], CssToInlineStyles $converter = null)
+    public function __construct(array $filesToInline = [], ?CssToInlineStyles $converter = null)
     {
         $this->cssToAlwaysInclude = $this->loadCssFromFiles($filesToInline);
 

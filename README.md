@@ -12,7 +12,7 @@ Laravel Mail CSS Inliner
 Most email clients won't render CSS (on a `<link>` or a `<style>`). The solution is inline your CSS directly on the HTML. Doing this by hand easily turns into unmantainable templates.
 The goal of this package is to automate the process of inlining that CSS before sending the emails.
 
-## Installation and compatability
+## Installation and compatibility
 
 Starting with version 5 this package requires PHP 8.0 and Laravel 9.0 or higher.
 
