@@ -234,6 +234,14 @@ class CssInlinerPluginTest extends TestCase
         }
 
         $this->assertEquals($this->stubs[$stub], $this->cleanupHtmlStringForComparison($actual));
+
+        if ($mediaSubType === 'html') {
+            $htmlBody = $message->getHtmlBody();
+
+            if (!empty($htmlBody)) {
+                $this->assertEquals($this->stubs[$stub], $this->cleanupHtmlStringForComparison($htmlBody));
+            }
+        }
     }
 
     private function assertSameMessageStructure(Email $expected, Email $actual)

@@ -105,6 +105,13 @@ class CssInlinerPlugin
                 )
             ));
         }
+
+        if (!empty($message->getHtmlBody())) {
+            $htmlBody = new TextPart($message->getHtmlBody());
+            $htmlBody = $this->processHtmlTextPart($htmlBody)->getBody();
+
+            $message->html($htmlBody);
+        }
     }
 
     private function extractCssFilesFromMailBody(string $message): array
