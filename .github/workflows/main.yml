@@ -84,4 +84,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Composer normalize
-        uses: localheinz/composer-normalize-action@0.5.2
+        uses: ergebnis/composer-normalize-action@0.8.0
