@@ -15,4 +15,16 @@ return [
 
     'css-files' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Css Content
+    |--------------------------------------------------------------------------
+    |
+    | Optionally, you may prefer to provide the CSS content as a String.
+    | This allows for compatibility with Vite by using Vite::content()
+    | If supplied, this string will be appended after your css-files.
+    |
+    */
+
+    'css-content' => null,
 ];
